@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.10.31)  21 MAY 2023 02:34
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.10.31)  21 MAY 2023 03:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2069,12 +2069,12 @@ Package fontspec Info: Font family 'FangSong(0)' created for font 'FangSong'
 
 
 LaTeX Font Warning: Font shape `TU/FangSong(0)/m/sl' undefined
-(Font)              using `TU/FangSong(0)/m/n' instead on input line 1166.
+(Font)              using `TU/FangSong(0)/m/n' instead on input line 1168.
 
-File: ui.png Graphic file (type bmp)
-<ui.png>
+File: ui.jpg Graphic file (type bmp)
+<ui.jpg>
 [25]
-Overfull \hbox (14.52092pt too wide) in paragraph at lines 1195--1196
+Overfull \hbox (14.52092pt too wide) in paragraph at lines 1197--1198
 []\TU/PalatinoLinotype(0)/m/it/10 ”mmseg/” \TU/SimSun(0)/m/it/10 下 为 \TU/Palati
 noLinotype(0)/m/it/10 mmsegmentation \TU/SimSun(0)/m/it/10 的 一 些 代 码 库，|  我 们 的
  自 定 义 模 型 的 源 代 码 可 以 在\TU/PalatinoLinotype(0)/m/it/10 ”mmseg/models/decode_he
@@ -2082,13 +2082,13 @@ ads/”
  []
 
 [26] [27]
-Underfull \hbox (badness 1859) in paragraph at lines 1257--1258
+Underfull \hbox (badness 1859) in paragraph at lines 1256--1257
 []\TU/PalatinoLinotype(0)/m/n/10 Tianyi Wu, Sheng Tang, Rui Zhang, Yongdong Zha
 ng. (2019). CGNet: A Light-weight Context
  []
 
 [28]
-Underfull \hbox (badness 1178) in paragraph at lines 1259--1260
+Underfull \hbox (badness 1178) in paragraph at lines 1258--1259
 []\TU/PalatinoLinotype(0)/m/n/10 Gao, R. (2021). Rethink Dilated Convolution fo
 r Real-time Semantic Segmentation. arXiv preprint
  []
@@ -2104,12 +2104,12 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 584A39D64E1768174E238E6310352641;4131.
  ) 
 Here is how much of TeX's memory you used:
- 57241 strings out of 476179
- 1328185 string characters out of 5813071
- 2195901 words of memory out of 5000000
- 77030 multiletter control sequences out of 15000+600000
+ 57237 strings out of 476179
+ 1328181 string characters out of 5813071
+ 2194901 words of memory out of 5000000
+ 77026 multiletter control sequences out of 15000+600000
  478450 words of font info for 109 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 108i,18n,117p,660b,1693s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 108i,18n,117p,660b,1720s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on main.pdf (33 pages).

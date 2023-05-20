@@ -983,7 +983,7 @@ Supervise-Portrait是Portraitnet作者从公开通用人像分割数据集Superv
   \end{tabular}
 \end{table}
 
-\textit{由于使用连通性损失会明显减慢训练速度，我们未与使用了连通性损失的模型mIoU 94.6\%对比。实际上，百度的官方代码实现中，该模型也未使用连通性损失。}
+\textit{由于使用连通性损失会明显减慢训练速度，我们未使用连通性巡视，因此也未与使用了连通性损失的模型mIoU 94.6\%对比。实际上，百度的官方代码实现中，该模型也未使用连通性损失。}
 
 
 \subsection{上下文模块的选择}
@@ -1103,7 +1103,7 @@ Supervise-Portrait是Portraitnet作者从公开通用人像分割数据集Superv
 
 \section{结论}
 \subsection{模型效果展示}
-我们在源代码的"checkpoints/"路径下提供了人像分割模型的三个参数文件，分别为在Supervise-Portrait、PP-HumanSeg14K和EG1800上训练的，配置文件均可在"local_configs\&logs/"路径下找到，final.py是Supervise-Portrait.pth对应的配置文件。由实验部分4.10，在pp-humanseg14k上训练的模型也许具有更强的鲁棒性。
+我们在源代码的"checkpoints/"路径下提供了人像分割模型的三个参数文件，分别为在Supervise-Portrait、PP-HumanSeg14K和EG1800上训练的，配置文件均可在"local_configs\&logs/"路径下找到，final.py是Supervise-Portrait.pth对应的配置文件。由实验部分4.9，在pp-humanseg14k上训练的模型也许具有更强的鲁棒性，在开放域测试中有更好的效果。
 模型效果如图\ref{fig:6}所示。
 \begin{figure}[!h]
   \centering
@@ -1157,13 +1157,15 @@ Supervise-Portrait是Portraitnet作者从公开通用人像分割数据集Superv
 \end{figure}
 
 我们还提供了demo文件和实时演示ui，展示背景替换的效果。
+
+\textit{环境配置应按mmsegmentation官方文档说明}
 \paragraph{Demo}~{}
 
 我们构建了seg_demo.py，通过命令行输入，简便地展示单张图片的效果，使用方法如下：
 
 \begin{python}
 	python seg_demo.py
-	--config(-c) [模型文件路径]  		    	#默认为best_aAcc_iter_10000.pth
+	--config(-c) [model1, model2]  		    	#默认为model1
 	--img_path(-i) [人像图片路径] 	      #默认为test.jpg
 	--bg_img_path(-b) [背景图片路径] 	    #默认为test_bg.jpg
 	--save_dir(-s) [保存输出图片]  		    #默认路径为output
@@ -1173,17 +1175,17 @@ Supervise-Portrait是Portraitnet作者从公开通用人像分割数据集Superv
 
 \paragraph{实时演示UI}~{}
 
-我们采用PyQt5构建UI界面进行实时视频效果展示的界面如图\ref{fig:image11}所示。
+我们采用PyQt5构建UI界面进行实时视频效果展示的界面如图所示。
 \begin{figure}[H]
 	\centering
-	\includegraphics[width = 1\textwidth]{ui.png}
+	\includegraphics[width = 1\textwidth]{ui.jpg}
 	\caption{UI界面示意图}
 	\label{fig:image11}
+	
 \end{figure}
-通过运行main.py，可以进入该UI界面。最上方工具栏有两个菜单栏，“模型”和“操作”，在“模型”菜单栏下可以选择不同的模型文件，并且激活摄像头。在“操作”菜单栏下可以选择“打开”选项，打开一个图片文件作为替换背景，选择“保存”选项，保存当前帧的输出图片，或者“退出”选项，关闭摄像头并关闭窗口。UI界面的左侧两个显示区域分别显示原视频和经过处理后替换背景的视频，右侧的滚动框内存有预设值的背景图片供使用者选择，使用者也可以通过下方“Open File"按钮选择本地文件中的图片作为背景。
+通过运行main.py，可以进入该UI界面。最上方工具栏有两个菜单栏，“Models”和“Edit”，在“Models”菜单栏下可以选择不同的模型文件，并且激活摄像头。在“Edit”菜单栏下可以选择“Open”选项，打开一个图片文件作为替换背景，选择“Save”选项，保存当前帧的输出图片，或者“Exit”选项，关闭摄像头并关闭窗口。UI界面的左侧两个显示区域分别显示原视频和经过处理后替换背景的视频，右侧的滚动框内存有预设值的背景图片供使用者选择，使用者也可以通过下方“Open File"按钮选择本地文件中的图片作为背景。
 
 在实时视频演示中，我们使用电脑的原相机为视频输入，读取每一帧为输入图片，经处理后输出，由于处理需要一定时间，我们的实时演示采用了抽帧的方式，降低了视频输出的帧率来保证实时性。
-
 \subsection{可执行代码构成}
 我们的源代码中有多个文件夹，这一部分将分别简单介绍其构成。
 
@@ -1198,11 +1200,8 @@ Supervise-Portrait是Portraitnet作者从公开通用人像分割数据集Superv
 
 \textit{"checkpoints/"下为模型参数，共包括三个，分别是在Supervise-Portrait、PP-HumanSeg14K和EG1800上训练的。}
 
-\textit{"show/"下为ui的源代码，执行方式如上一部分所述。}
+\textit{"show/"下为ui的源代码，执行方式如上一部分所述。"output"下为demo生成图片的默认路径}
 
-\textit{"seg_demo.py"可以简便的展示背景替换的效果，使用方式如上一部分所述。}
-
-\textit{"final.py"为在Supervise-Portrait上训练的最终模型的配置文件。}
 
 \subsection{总结与展望}
 
