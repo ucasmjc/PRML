@@ -626,7 +626,7 @@ dst\left(x,y\right) = min_{\text{$(x',y'):element(x',y')\neq 0$}} src \left(x+x'
 
 后处理操作是对模型输出图片先进行腐蚀操作，然后再进行膨胀操作。这种组合操作的主要目的是在保持对象形状的同时，减少噪声和小的细节。
 
-效果对比图如下：
+效果对比图见图\ref{img:poss}。
 \begin{figure}[!h]
     \centering
     \subfigure[]{
@@ -659,7 +659,7 @@ dst\left(x,y\right) = min_{\text{$(x',y'):element(x',y')\neq 0$}} src \left(x+x'
     \end{minipage}%
     }%
     \caption{(a)原图；(b)腐蚀操作效果图；(c)膨胀操作效果图；(d)后处理操作效果图}
-
+\label{img:poss}
 \end{figure}
 
 \subsubsection{光流法操作}
@@ -673,7 +673,7 @@ dst\left(x,y\right) = min_{\text{$(x',y'):element(x',y')\neq 0$}} src \left(x+x'
 
 2.\textbf{时间连续或运动是"小运动"。}即时间的变化不会引起目标位置的剧烈变化，相邻帧之间位移要比较小。同样也是光流法不可或缺的假定。
 
-\subsection{基本约束方程}
+\textbf{基本约束方程}
 
 考虑一个像素I(x,y,t)在第一帧的光强度它移动了 (dx,dy)的距离到下一帧，用了dt时间。因为是同一个像素点，依据上文提到的第一个假设我们认为该像素在运动前后的光强度是不变的，即：
 \[
@@ -1103,7 +1103,7 @@ Supervise-Portrait是Portraitnet作者从公开通用人像分割数据集Superv
 
 \section{结论}
 \subsection{模型效果展示}
-我们在源代码的"checkpoints/"路径下提供了人像分割模型的三个参数文件，分别为在Supervise-Portrait、PP-HumanSeg14K和EG1800上训练的，配置文件均可在"local_configs\&logs/"路径下找到，final.py是Supervise-Portrait.pth对应的配置文件。由实验部分4.9，在pp-humanseg14k上训练的模型也许具有更强的鲁棒性，在开放域测试中有更好的效果。
+我们在源代码的"checkpoints/"路径下提供了人像分割模型的三个参数文件，分别为在Supervise-Portrait、PP-HumanSeg14K和EG1800上训练的，配置文件均可在"local_configs\&logs/"路径下找到，final.py是Supervise-Portrait.pth对应的配置文件。由实验部分4.9，在pp-humanseg14k上训练的模型也许具有更强的鲁棒性，在开放域测试中有更好的效果。我们在"codes/show/test_img/"下提供了验证集的几张图片，可以使用他们来检验模型的效果。
 模型效果如图\ref{fig:6}所示。
 \begin{figure}[!h]
   \centering

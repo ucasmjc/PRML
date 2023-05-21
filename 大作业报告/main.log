@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.10.31)  21 MAY 2023 03:41
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.10.31)  21 MAY 2023 04:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2101,13 +2101,13 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 584A39D64E1768174E238E6310352641;4131.
+(rerunfilecheck)             Checksum: 7D0AEA0C6807FD5DBFCC1E8BEB4474B4;4025.
  ) 
 Here is how much of TeX's memory you used:
- 57237 strings out of 476179
- 1328181 string characters out of 5813071
- 2194901 words of memory out of 5000000
- 77026 multiletter control sequences out of 15000+600000
+ 57238 strings out of 476179
+ 1328191 string characters out of 5813071
+ 2194974 words of memory out of 5000000
+ 77027 multiletter control sequences out of 15000+600000
  478450 words of font info for 109 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  108i,18n,117p,660b,1720s stack positions out of 10000i,1000n,20000p,200000b,200000s
