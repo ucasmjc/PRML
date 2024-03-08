@@ -1,0 +1,1330 @@
+2023/05/20 15:50:16 - mmengine - INFO - 
+------------------------------------------------------------
+System environment:
+    sys.platform: linux
+    Python: 3.8.7 (default, Feb  5 2021, 16:56:08) [GCC 5.4.0 20160609]
+    CUDA available: True
+    numpy_random_seed: 304
+    GPU 0,1,2,3,4,5,6,7,8,9: NVIDIA GeForce RTX 2080 Ti
+    CUDA_HOME: /usr/local/cuda-11.3
+    NVCC: Cuda compilation tools, release 11.3, V11.3.109
+    GCC: gcc (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609
+    PyTorch: 1.12.1+cu113
+    PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.3.2  (built against CUDA 11.5)
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.3.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.12.1, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+    TorchVision: 0.13.1+cu113
+    OpenCV: 4.6.0
+    MMEngine: 0.7.2
+
+Runtime environment:
+    cudnn_benchmark: True
+    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
+    dist_cfg: {'backend': 'nccl'}
+    seed: 304
+    Distributed launcher: pytorch
+    Distributed training: True
+    GPU number: 4
+------------------------------------------------------------
+
+2023/05/20 15:50:18 - mmengine - INFO - Config:
+dataset_type = 'PortraitDataset'
+data_root = 'data/portrait'
+crop_size = (512, 512)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(
+        type='RandomResize',
+        scale=(1024, 1024),
+        ratio_range=(0.5, 1.5),
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=(512, 512), cat_max_ratio=0.75),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='PhotoMetricDistortion'),
+    dict(type='PackSegInputs')
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', scale=(1024, 512), keep_ratio=True),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(type='PackSegInputs')
+]
+img_ratios = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+tta_pipeline = [
+    dict(type='LoadImageFromFile', backend_args=None),
+    dict(
+        type='TestTimeAug',
+        transforms=[[{
+            'type': 'Resize',
+            'scale_factor': 0.5,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 0.75,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.0,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.25,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.5,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.75,
+            'keep_ratio': True
+        }],
+                    [{
+                        'type': 'RandomFlip',
+                        'prob': 0.0,
+                        'direction': 'horizontal'
+                    }, {
+                        'type': 'RandomFlip',
+                        'prob': 1.0,
+                        'direction': 'horizontal'
+                    }], [{
+                        'type': 'LoadAnnotations'
+                    }], [{
+                        'type': 'PackSegInputs'
+                    }]])
+]
+train_dataloader = dict(
+    batch_size=6,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='InfiniteSampler', shuffle=True),
+    dataset=dict(
+        type='PortraitDataset',
+        data_root='data/portrait',
+        data_prefix=dict(img_path='train/img', seg_map_path='train/ann'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', reduce_zero_label=False),
+            dict(
+                type='RandomResize',
+                scale=(1024, 1024),
+                ratio_range=(0.5, 1.5),
+                keep_ratio=True),
+            dict(type='RandomCrop', crop_size=(512, 512), cat_max_ratio=0.75),
+            dict(type='RandomFlip', prob=0.5),
+            dict(type='PhotoMetricDistortion'),
+            dict(type='PackSegInputs')
+        ]))
+val_dataloader = dict(
+    batch_size=1,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='PortraitDataset',
+        data_root='data/portrait',
+        data_prefix=dict(img_path='val/img', seg_map_path='val/ann'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', scale=(1024, 512), keep_ratio=True),
+            dict(type='LoadAnnotations', reduce_zero_label=False),
+            dict(type='PackSegInputs')
+        ]))
+test_dataloader = dict(
+    batch_size=1,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='PortraitDataset',
+        data_root='data/portrait',
+        data_prefix=dict(img_path='val/img', seg_map_path='val/ann'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', scale=(1024, 512), keep_ratio=True),
+            dict(type='LoadAnnotations', reduce_zero_label=False),
+            dict(type='PackSegInputs')
+        ]))
+val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
+test_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
+default_scope = 'mmseg'
+env_cfg = dict(
+    cudnn_benchmark=True,
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
+    dist_cfg=dict(backend='nccl'))
+vis_backends = [
+    dict(type='LocalVisBackend'),
+    dict(type='TensorboardVisBackend')
+]
+visualizer = dict(
+    type='SegLocalVisualizer',
+    vis_backends=[
+        dict(type='LocalVisBackend'),
+        dict(type='TensorboardVisBackend')
+    ],
+    name='visualizer')
+log_processor = dict(by_epoch=False)
+log_level = 'INFO'
+load_from = None
+resume = False
+tta_model = dict(type='SegTTAModel')
+work_dir = 'workdirs/dappm'
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+data_preprocessor = dict(
+    type='SegDataPreProcessor',
+    mean=[123.675, 116.28, 103.53],
+    std=[58.395, 57.12, 57.375],
+    bgr_to_rgb=True,
+    pad_val=0,
+    seg_pad_val=255,
+    size=(512, 512))
+model = dict(
+    type='EncoderDecoder',
+    data_preprocessor=dict(
+        type='SegDataPreProcessor',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        bgr_to_rgb=True,
+        pad_val=0,
+        seg_pad_val=255,
+        size=(512, 512)),
+    pretrained='open-mmlab://contrib/mobilenet_v3_small',
+    backbone=dict(
+        type='MobileNetV3',
+        arch='small',
+        out_indices=(1, 8),
+        norm_cfg=dict(type='SyncBN', requires_grad=True)),
+    decode_head=dict(
+        type='testHead',
+        neck=1,
+        fuse=1,
+        in_channels=(16, 48),
+        in_index=(0, 1),
+        channels=32,
+        input_transform='multiple_select',
+        num_classes=2,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        act_cfg=dict(type='ReLU'),
+        align_corners=False,
+        loss_decode=dict(
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
+    train_cfg=dict(),
+    test_cfg=dict(mode='whole'))
+iters = 12000
+param_scheduler = [
+    dict(type='LinearLR', by_epoch=False, start_factor=0.1, begin=0, end=300),
+    dict(
+        type='PolyLR',
+        eta_min=0.0001,
+        power=0.9,
+        begin=300,
+        end=9000,
+        by_epoch=False),
+    dict(
+        type='PolyLR',
+        eta_min=0,
+        power=0.9,
+        begin=9000,
+        end=12000,
+        by_epoch=False)
+]
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
+optim_wrapper = dict(
+    type='OptimWrapper',
+    optimizer=dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005))
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=12000, val_interval=240)
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
+default_hooks = dict(
+    timer=dict(type='IterTimerHook'),
+    logger=dict(type='LoggerHook', interval=200, log_metric_by_epoch=False),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    checkpoint=dict(
+        type='CheckpointHook',
+        by_epoch=False,
+        save_best='auto',
+        max_keep_ckpts=2,
+        interval=2400),
+    sampler_seed=dict(type='DistSamplerSeedHook'),
+    visualization=dict(type='SegVisualizationHook', draw=True))
+randomness = dict(seed=304)
+launcher = 'pytorch'
+
+2023/05/20 15:50:22 - mmengine - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+before_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DistSamplerSeedHook                
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) IterTimerHook                      
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_val_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_val_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train:
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_test_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_test_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_test_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_run:
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+2023/05/20 15:50:24 - mmengine - WARNING - The prefix is not set in metric class IoUMetric.
+2023/05/20 15:50:26 - mmengine - INFO - load model from: open-mmlab://contrib/mobilenet_v3_small
+2023/05/20 15:50:26 - mmengine - INFO - Loads checkpoint by openmmlab backend from path: open-mmlab://contrib/mobilenet_v3_small
+2023/05/20 15:50:26 - mmengine - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: layer9.expand_conv.conv.weight, layer9.expand_conv.bn.weight, layer9.expand_conv.bn.bias, layer9.expand_conv.bn.running_mean, layer9.expand_conv.bn.running_var, layer9.expand_conv.bn.num_batches_tracked, layer9.depthwise_conv.conv.weight, layer9.depthwise_conv.bn.weight, layer9.depthwise_conv.bn.bias, layer9.depthwise_conv.bn.running_mean, layer9.depthwise_conv.bn.running_var, layer9.depthwise_conv.bn.num_batches_tracked, layer9.se.conv1.conv.weight, layer9.se.conv1.conv.bias, layer9.se.conv2.conv.weight, layer9.se.conv2.conv.bias, layer9.linear_conv.conv.weight, layer9.linear_conv.bn.weight, layer9.linear_conv.bn.bias, layer9.linear_conv.bn.running_mean, layer9.linear_conv.bn.running_var, layer9.linear_conv.bn.num_batches_tracked, layer10.expand_conv.conv.weight, layer10.expand_conv.bn.weight, layer10.expand_conv.bn.bias, layer10.expand_conv.bn.running_mean, layer10.expand_conv.bn.running_var, layer10.expand_conv.bn.num_batches_tracked, layer10.depthwise_conv.conv.weight, layer10.depthwise_conv.bn.weight, layer10.depthwise_conv.bn.bias, layer10.depthwise_conv.bn.running_mean, layer10.depthwise_conv.bn.running_var, layer10.depthwise_conv.bn.num_batches_tracked, layer10.se.conv1.conv.weight, layer10.se.conv1.conv.bias, layer10.se.conv2.conv.weight, layer10.se.conv2.conv.bias, layer10.linear_conv.conv.weight, layer10.linear_conv.bn.weight, layer10.linear_conv.bn.bias, layer10.linear_conv.bn.running_mean, layer10.linear_conv.bn.running_var, layer10.linear_conv.bn.num_batches_tracked, layer11.expand_conv.conv.weight, layer11.expand_conv.bn.weight, layer11.expand_conv.bn.bias, layer11.expand_conv.bn.running_mean, layer11.expand_conv.bn.running_var, layer11.expand_conv.bn.num_batches_tracked, layer11.depthwise_conv.conv.weight, layer11.depthwise_conv.bn.weight, layer11.depthwise_conv.bn.bias, layer11.depthwise_conv.bn.running_mean, layer11.depthwise_conv.bn.running_var, layer11.depthwise_conv.bn.num_batches_tracked, layer11.se.conv1.conv.weight, layer11.se.conv1.conv.bias, layer11.se.conv2.conv.weight, layer11.se.conv2.conv.bias, layer11.linear_conv.conv.weight, layer11.linear_conv.bn.weight, layer11.linear_conv.bn.bias, layer11.linear_conv.bn.running_mean, layer11.linear_conv.bn.running_var, layer11.linear_conv.bn.num_batches_tracked, layer12.conv.weight, layer12.bn.weight, layer12.bn.bias, layer12.bn.running_mean, layer12.bn.running_var, layer12.bn.num_batches_tracked
+
+Name of parameter - Initialization information
+
+backbone.layer0.conv.weight - torch.Size([16, 3, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer0.bn.weight - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer0.bn.bias - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.depthwise_conv.conv.weight - torch.Size([16, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.depthwise_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.depthwise_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.se.conv1.conv.weight - torch.Size([8, 16, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.se.conv1.conv.bias - torch.Size([8]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.se.conv2.conv.weight - torch.Size([16, 8, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.se.conv2.conv.bias - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.linear_conv.conv.weight - torch.Size([16, 16, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.linear_conv.bn.weight - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer1.linear_conv.bn.bias - torch.Size([16]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.expand_conv.conv.weight - torch.Size([72, 16, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.expand_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.expand_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.depthwise_conv.conv.weight - torch.Size([72, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.depthwise_conv.bn.weight - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.depthwise_conv.bn.bias - torch.Size([72]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.linear_conv.conv.weight - torch.Size([24, 72, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer2.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.expand_conv.conv.weight - torch.Size([88, 24, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.expand_conv.bn.weight - torch.Size([88]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.expand_conv.bn.bias - torch.Size([88]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.depthwise_conv.conv.weight - torch.Size([88, 1, 3, 3]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.depthwise_conv.bn.weight - torch.Size([88]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.depthwise_conv.bn.bias - torch.Size([88]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.linear_conv.conv.weight - torch.Size([24, 88, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.linear_conv.bn.weight - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer3.linear_conv.bn.bias - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.expand_conv.conv.weight - torch.Size([96, 24, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.expand_conv.bn.weight - torch.Size([96]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.expand_conv.bn.bias - torch.Size([96]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.depthwise_conv.conv.weight - torch.Size([96, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.depthwise_conv.bn.weight - torch.Size([96]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.depthwise_conv.bn.bias - torch.Size([96]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.se.conv1.conv.weight - torch.Size([24, 96, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.se.conv1.conv.bias - torch.Size([24]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.se.conv2.conv.weight - torch.Size([96, 24, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.se.conv2.conv.bias - torch.Size([96]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.linear_conv.conv.weight - torch.Size([40, 96, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer4.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.expand_conv.conv.weight - torch.Size([240, 40, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.expand_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.expand_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.depthwise_conv.conv.weight - torch.Size([240, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.depthwise_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.depthwise_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.se.conv1.conv.weight - torch.Size([64, 240, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.se.conv1.conv.bias - torch.Size([64]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.se.conv2.conv.weight - torch.Size([240, 64, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.se.conv2.conv.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.linear_conv.conv.weight - torch.Size([40, 240, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer5.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.expand_conv.conv.weight - torch.Size([240, 40, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.expand_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.expand_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.depthwise_conv.conv.weight - torch.Size([240, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.depthwise_conv.bn.weight - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.depthwise_conv.bn.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.se.conv1.conv.weight - torch.Size([64, 240, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.se.conv1.conv.bias - torch.Size([64]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.se.conv2.conv.weight - torch.Size([240, 64, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.se.conv2.conv.bias - torch.Size([240]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.linear_conv.conv.weight - torch.Size([40, 240, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.linear_conv.bn.weight - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer6.linear_conv.bn.bias - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.expand_conv.conv.weight - torch.Size([120, 40, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.expand_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.expand_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.depthwise_conv.conv.weight - torch.Size([120, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.depthwise_conv.bn.weight - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.depthwise_conv.bn.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.se.conv1.conv.weight - torch.Size([32, 120, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.se.conv1.conv.bias - torch.Size([32]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.se.conv2.conv.weight - torch.Size([120, 32, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.se.conv2.conv.bias - torch.Size([120]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.linear_conv.conv.weight - torch.Size([48, 120, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.linear_conv.bn.weight - torch.Size([48]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer7.linear_conv.bn.bias - torch.Size([48]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.expand_conv.conv.weight - torch.Size([144, 48, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.expand_conv.bn.weight - torch.Size([144]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.expand_conv.bn.bias - torch.Size([144]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.depthwise_conv.conv.weight - torch.Size([144, 1, 5, 5]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.depthwise_conv.bn.weight - torch.Size([144]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.depthwise_conv.bn.bias - torch.Size([144]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.se.conv1.conv.weight - torch.Size([40, 144, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.se.conv1.conv.bias - torch.Size([40]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.se.conv2.conv.weight - torch.Size([144, 40, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.se.conv2.conv.bias - torch.Size([144]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.linear_conv.conv.weight - torch.Size([48, 144, 1, 1]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.linear_conv.bn.weight - torch.Size([48]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+backbone.layer8.linear_conv.bn.bias - torch.Size([48]): 
+PretrainedInit: load from open-mmlab://contrib/mobilenet_v3_small 
+
+decode_head.conv_seg.weight - torch.Size([2, 32, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.conv_seg.bias - torch.Size([2]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.fuse4.local_embedding.conv.weight - torch.Size([32, 16, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse4.local_embedding.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse4.local_embedding.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse4.global_act.conv.weight - torch.Size([32, 48, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse4.global_act.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse4.global_act.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.0.conv.weight - torch.Size([24, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.scales.0.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.0.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.1.1.conv.weight - torch.Size([24, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.scales.1.1.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.1.1.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.2.1.conv.weight - torch.Size([24, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.scales.2.1.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.2.1.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.3.1.conv.weight - torch.Size([24, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.scales.3.1.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.3.1.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.4.1.conv.weight - torch.Size([24, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.scales.4.1.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.scales.4.1.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.0.conv.weight - torch.Size([24, 24, 3, 3]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.processes.0.bn.weight - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.0.bn.bias - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.1.conv.weight - torch.Size([24, 24, 3, 3]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.processes.1.bn.weight - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.1.bn.bias - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.2.conv.weight - torch.Size([24, 24, 3, 3]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.processes.2.bn.weight - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.2.bn.bias - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.3.conv.weight - torch.Size([24, 24, 3, 3]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.processes.3.bn.weight - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.processes.3.bn.bias - torch.Size([24]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.compression.conv.weight - torch.Size([48, 120, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.compression.bn.weight - torch.Size([120]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.compression.bn.bias - torch.Size([120]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.shortcut.conv.weight - torch.Size([48, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.neck.shortcut.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.neck.shortcut.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+2023/05/20 15:50:26 - mmengine - WARNING - "FileClient" will be deprecated in future. Please use io functions in https://mmengine.readthedocs.io/en/latest/api/fileio.html#file-io
+2023/05/20 15:50:26 - mmengine - WARNING - "HardDiskBackend" is the alias of "LocalBackend" and the former will be deprecated in future.
+2023/05/20 15:50:26 - mmengine - INFO - Checkpoints will be saved to /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm.
+2023/05/20 15:51:06 - mmengine - INFO - Iter(train) [  200/12000]  lr: 6.9900e-03  eta: 0:39:48  time: 0.1730  data_time: 0.0151  memory: 1154  loss: 0.5799  decode.loss_ce: 0.5799  decode.acc_seg: 69.6562
+2023/05/20 15:51:24 - mmengine - INFO - per class results:
+2023/05/20 15:51:24 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 52.49 | 64.91 |
+|   person   | 71.43 | 86.13 |
++------------+-------+-------+
+2023/05/20 15:51:24 - mmengine - INFO - Iter(val) [60/60]    aAcc: 78.2900  mIoU: 61.9600  mAcc: 75.5200  data_time: 0.1588  time: 0.2269
+2023/05/20 15:51:25 - mmengine - INFO - The best checkpoint with 78.2900 aAcc at 240 iter is saved to best_aAcc_iter_240.pth.
+2023/05/20 15:51:40 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 15:51:53 - mmengine - INFO - Iter(train) [  400/12000]  lr: 9.8985e-03  eta: 0:37:17  time: 0.1547  data_time: 0.0147  memory: 1270  loss: 0.4985  decode.loss_ce: 0.4985  decode.acc_seg: 77.6975
+2023/05/20 15:52:11 - mmengine - INFO - per class results:
+2023/05/20 15:52:11 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 57.45 | 67.14 |
+|   person   | 75.55 | 90.11 |
++------------+-------+-------+
+2023/05/20 15:52:11 - mmengine - INFO - Iter(val) [60/60]    aAcc: 81.6200  mIoU: 66.5000  mAcc: 78.6200  data_time: 0.1401  time: 0.2095
+2023/05/20 15:52:11 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_240.pth is removed
+2023/05/20 15:52:13 - mmengine - INFO - The best checkpoint with 81.6200 aAcc at 480 iter is saved to best_aAcc_iter_480.pth.
+2023/05/20 15:52:34 - mmengine - INFO - Iter(train) [  600/12000]  lr: 9.6932e-03  eta: 0:36:05  time: 0.1583  data_time: 0.0148  memory: 1105  loss: 0.4860  decode.loss_ce: 0.4860  decode.acc_seg: 77.7259
+2023/05/20 15:52:59 - mmengine - INFO - per class results:
+2023/05/20 15:52:59 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 64.56 | 76.08 |
+|   person   | 78.52 | 89.54 |
++------------+-------+-------+
+2023/05/20 15:52:59 - mmengine - INFO - Iter(val) [60/60]    aAcc: 84.5600  mIoU: 71.5400  mAcc: 82.8100  data_time: 0.1586  time: 0.2032
+2023/05/20 15:52:59 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_480.pth is removed
+2023/05/20 15:53:00 - mmengine - INFO - The best checkpoint with 84.5600 aAcc at 720 iter is saved to best_aAcc_iter_720.pth.
+2023/05/20 15:53:14 - mmengine - INFO - Iter(train) [  800/12000]  lr: 9.4874e-03  eta: 0:35:07  time: 0.1607  data_time: 0.0148  memory: 1105  loss: 0.4614  decode.loss_ce: 0.4614  decode.acc_seg: 79.8113
+2023/05/20 15:53:46 - mmengine - INFO - per class results:
+2023/05/20 15:53:46 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 71.18 | 81.86 |
+|   person   | 82.43 |  91.2 |
++------------+-------+-------+
+2023/05/20 15:53:46 - mmengine - INFO - Iter(val) [60/60]    aAcc: 87.7500  mIoU: 76.8100  mAcc: 86.5300  data_time: 0.1541  time: 0.1954
+2023/05/20 15:53:46 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_720.pth is removed
+2023/05/20 15:53:48 - mmengine - INFO - The best checkpoint with 87.7500 aAcc at 960 iter is saved to best_aAcc_iter_960.pth.
+2023/05/20 15:53:54 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 15:53:54 - mmengine - INFO - Iter(train) [ 1000/12000]  lr: 9.2811e-03  eta: 0:34:20  time: 0.1792  data_time: 0.0151  memory: 1105  loss: 0.4261  decode.loss_ce: 0.4261  decode.acc_seg: 84.1665
+2023/05/20 15:54:29 - mmengine - INFO - Iter(train) [ 1200/12000]  lr: 9.0742e-03  eta: 0:33:16  time: 0.1603  data_time: 0.0153  memory: 1104  loss: 0.4433  decode.loss_ce: 0.4433  decode.acc_seg: 87.4205
+2023/05/20 15:54:33 - mmengine - INFO - per class results:
+2023/05/20 15:54:33 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 75.95 | 84.36 |
+|   person   | 85.66 | 93.51 |
++------------+-------+-------+
+2023/05/20 15:54:33 - mmengine - INFO - Iter(val) [60/60]    aAcc: 90.1300  mIoU: 80.8000  mAcc: 88.9400  data_time: 0.1492  time: 0.1896
+2023/05/20 15:54:33 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_960.pth is removed
+2023/05/20 15:54:34 - mmengine - INFO - The best checkpoint with 90.1300 aAcc at 1200 iter is saved to best_aAcc_iter_1200.pth.
+2023/05/20 15:55:09 - mmengine - INFO - Iter(train) [ 1400/12000]  lr: 8.8669e-03  eta: 0:32:39  time: 0.1810  data_time: 0.0155  memory: 1104  loss: 0.3443  decode.loss_ce: 0.3443  decode.acc_seg: 80.6334
+2023/05/20 15:55:20 - mmengine - INFO - per class results:
+2023/05/20 15:55:20 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  81.4 | 90.24 |
+|   person   | 88.56 | 93.63 |
++------------+-------+-------+
+2023/05/20 15:55:20 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.3800  mIoU: 84.9800  mAcc: 91.9300  data_time: 0.1506  time: 0.1883
+2023/05/20 15:55:20 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_1200.pth is removed
+2023/05/20 15:55:22 - mmengine - INFO - The best checkpoint with 92.3800 aAcc at 1440 iter is saved to best_aAcc_iter_1440.pth.
+2023/05/20 15:55:50 - mmengine - INFO - Iter(train) [ 1600/12000]  lr: 8.6590e-03  eta: 0:32:01  time: 0.1756  data_time: 0.0149  memory: 1105  loss: 0.3322  decode.loss_ce: 0.3322  decode.acc_seg: 88.3491
+2023/05/20 15:56:07 - mmengine - INFO - per class results:
+2023/05/20 15:56:07 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.79 | 90.13 |
+|   person   | 90.33 | 95.56 |
++------------+-------+-------+
+2023/05/20 15:56:07 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.5500  mIoU: 87.0600  mAcc: 92.8500  data_time: 0.1500  time: 0.1876
+2023/05/20 15:56:07 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_1440.pth is removed
+2023/05/20 15:56:08 - mmengine - INFO - The best checkpoint with 93.5500 aAcc at 1680 iter is saved to best_aAcc_iter_1680.pth.
+2023/05/20 15:56:29 - mmengine - INFO - Iter(train) [ 1800/12000]  lr: 8.4505e-03  eta: 0:31:20  time: 0.1565  data_time: 0.0151  memory: 1105  loss: 0.3381  decode.loss_ce: 0.3381  decode.acc_seg: 83.4748
+2023/05/20 15:56:54 - mmengine - INFO - per class results:
+2023/05/20 15:56:54 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 85.26 | 91.22 |
+|   person   |  91.2 |  95.9 |
++------------+-------+-------+
+2023/05/20 15:56:54 - mmengine - INFO - Iter(val) [60/60]    aAcc: 94.1700  mIoU: 88.2300  mAcc: 93.5600  data_time: 0.1529  time: 0.1946
+2023/05/20 15:56:54 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_1680.pth is removed
+2023/05/20 15:56:56 - mmengine - INFO - The best checkpoint with 94.1700 aAcc at 1920 iter is saved to best_aAcc_iter_1920.pth.
+2023/05/20 15:57:09 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 15:57:09 - mmengine - INFO - Iter(train) [ 2000/12000]  lr: 8.2414e-03  eta: 0:30:40  time: 0.1701  data_time: 0.0151  memory: 1105  loss: 0.2452  decode.loss_ce: 0.2452  decode.acc_seg: 85.5514
+2023/05/20 15:57:40 - mmengine - INFO - per class results:
+2023/05/20 15:57:40 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 87.63 | 92.77 |
+|   person   | 92.63 | 96.56 |
++------------+-------+-------+
+2023/05/20 15:57:40 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.1600  mIoU: 90.1300  mAcc: 94.6700  data_time: 0.1507  time: 0.1859
+2023/05/20 15:57:40 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_1920.pth is removed
+2023/05/20 15:57:42 - mmengine - INFO - The best checkpoint with 95.1600 aAcc at 2160 iter is saved to best_aAcc_iter_2160.pth.
+2023/05/20 15:57:49 - mmengine - INFO - Iter(train) [ 2200/12000]  lr: 8.0318e-03  eta: 0:30:00  time: 0.1677  data_time: 0.0161  memory: 1105  loss: 0.3001  decode.loss_ce: 0.3001  decode.acc_seg: 90.5907
+2023/05/20 15:58:23 - mmengine - INFO - Iter(train) [ 2400/12000]  lr: 7.8215e-03  eta: 0:29:13  time: 0.1635  data_time: 0.0149  memory: 1105  loss: 0.2485  decode.loss_ce: 0.2485  decode.acc_seg: 87.8861
+2023/05/20 15:58:23 - mmengine - INFO - Saving checkpoint at 2400 iterations
+2023/05/20 15:58:28 - mmengine - INFO - per class results:
+2023/05/20 15:58:28 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 88.25 |  93.9 |
+|   person   | 92.92 | 96.24 |
++------------+-------+-------+
+2023/05/20 15:58:28 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.3800  mIoU: 90.5800  mAcc: 95.0700  data_time: 0.1500  time: 0.1864
+2023/05/20 15:58:28 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_2160.pth is removed
+2023/05/20 15:58:30 - mmengine - INFO - The best checkpoint with 95.3800 aAcc at 2400 iter is saved to best_aAcc_iter_2400.pth.
+2023/05/20 15:59:05 - mmengine - INFO - Iter(train) [ 2600/12000]  lr: 7.6106e-03  eta: 0:28:37  time: 0.1570  data_time: 0.0155  memory: 1105  loss: 0.2643  decode.loss_ce: 0.2643  decode.acc_seg: 82.5934
+2023/05/20 15:59:15 - mmengine - INFO - per class results:
+2023/05/20 15:59:15 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 89.05 | 94.32 |
+|   person   | 93.42 | 96.53 |
++------------+-------+-------+
+2023/05/20 15:59:15 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.7100  mIoU: 91.2400  mAcc: 95.4200  data_time: 0.1535  time: 0.1897
+2023/05/20 15:59:15 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_2400.pth is removed
+2023/05/20 15:59:17 - mmengine - INFO - The best checkpoint with 95.7100 aAcc at 2640 iter is saved to best_aAcc_iter_2640.pth.
+2023/05/20 15:59:45 - mmengine - INFO - Iter(train) [ 2800/12000]  lr: 7.3990e-03  eta: 0:28:00  time: 0.1771  data_time: 0.0152  memory: 1105  loss: 0.2439  decode.loss_ce: 0.2439  decode.acc_seg: 97.2517
+2023/05/20 16:00:02 - mmengine - INFO - per class results:
+2023/05/20 16:00:02 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  89.6 | 94.83 |
+|   person   | 93.73 | 96.57 |
++------------+-------+-------+
+2023/05/20 16:00:02 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.9300  mIoU: 91.6700  mAcc: 95.7000  data_time: 0.1511  time: 0.1953
+2023/05/20 16:00:02 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_2640.pth is removed
+2023/05/20 16:00:04 - mmengine - INFO - The best checkpoint with 95.9300 aAcc at 2880 iter is saved to best_aAcc_iter_2880.pth.
+2023/05/20 16:00:24 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:00:24 - mmengine - INFO - Iter(train) [ 3000/12000]  lr: 7.1868e-03  eta: 0:27:20  time: 0.1627  data_time: 0.0150  memory: 1105  loss: 0.2026  decode.loss_ce: 0.2026  decode.acc_seg: 92.2948
+2023/05/20 16:00:48 - mmengine - INFO - per class results:
+2023/05/20 16:00:48 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 89.67 |  94.1 |
+|   person   | 93.86 | 97.11 |
++------------+-------+-------+
+2023/05/20 16:00:48 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.9900  mIoU: 91.7700  mAcc: 95.6000  data_time: 0.1506  time: 0.1870
+2023/05/20 16:00:48 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_2880.pth is removed
+2023/05/20 16:00:49 - mmengine - INFO - The best checkpoint with 95.9900 aAcc at 3120 iter is saved to best_aAcc_iter_3120.pth.
+2023/05/20 16:01:04 - mmengine - INFO - Iter(train) [ 3200/12000]  lr: 6.9738e-03  eta: 0:26:44  time: 0.1863  data_time: 0.0160  memory: 1105  loss: 0.2590  decode.loss_ce: 0.2590  decode.acc_seg: 83.6386
+2023/05/20 16:01:35 - mmengine - INFO - per class results:
+2023/05/20 16:01:35 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 88.96 | 93.72 |
+|   person   | 93.42 | 96.86 |
++------------+-------+-------+
+2023/05/20 16:01:35 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.7000  mIoU: 91.1900  mAcc: 95.2900  data_time: 0.1519  time: 0.1872
+2023/05/20 16:01:41 - mmengine - INFO - Iter(train) [ 3400/12000]  lr: 6.7601e-03  eta: 0:26:01  time: 0.1587  data_time: 0.0148  memory: 1105  loss: 0.2114  decode.loss_ce: 0.2114  decode.acc_seg: 94.9062
+2023/05/20 16:02:15 - mmengine - INFO - Iter(train) [ 3600/12000]  lr: 6.5457e-03  eta: 0:25:20  time: 0.1744  data_time: 0.0155  memory: 1105  loss: 0.2109  decode.loss_ce: 0.2109  decode.acc_seg: 92.9958
+2023/05/20 16:02:19 - mmengine - INFO - per class results:
+2023/05/20 16:02:19 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 87.78 | 94.04 |
+|   person   | 92.58 | 95.82 |
++------------+-------+-------+
+2023/05/20 16:02:19 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.1600  mIoU: 90.1800  mAcc: 94.9300  data_time: 0.1506  time: 0.1859
+2023/05/20 16:02:53 - mmengine - INFO - Iter(train) [ 3800/12000]  lr: 6.3304e-03  eta: 0:24:41  time: 0.1646  data_time: 0.0154  memory: 1105  loss: 0.1987  decode.loss_ce: 0.1987  decode.acc_seg: 91.6789
+2023/05/20 16:03:04 - mmengine - INFO - per class results:
+2023/05/20 16:03:04 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 90.86 | 93.81 |
+|   person   | 94.66 |  98.1 |
++------------+-------+-------+
+2023/05/20 16:03:04 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.5100  mIoU: 92.7600  mAcc: 95.9500  data_time: 0.1492  time: 0.1951
+2023/05/20 16:03:04 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_3120.pth is removed
+2023/05/20 16:03:06 - mmengine - INFO - The best checkpoint with 96.5100 aAcc at 3840 iter is saved to best_aAcc_iter_3840.pth.
+2023/05/20 16:03:34 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:03:34 - mmengine - INFO - Iter(train) [ 4000/12000]  lr: 6.1143e-03  eta: 0:24:06  time: 0.1568  data_time: 0.0166  memory: 1105  loss: 0.2381  decode.loss_ce: 0.2381  decode.acc_seg: 95.4182
+2023/05/20 16:03:52 - mmengine - INFO - per class results:
+2023/05/20 16:03:52 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 89.56 | 93.25 |
+|   person   | 93.87 | 97.58 |
++------------+-------+-------+
+2023/05/20 16:03:52 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.9800  mIoU: 91.7100  mAcc: 95.4100  data_time: 0.1499  time: 0.1978
+2023/05/20 16:04:12 - mmengine - INFO - Iter(train) [ 4200/12000]  lr: 5.8974e-03  eta: 0:23:28  time: 0.1825  data_time: 0.0158  memory: 1105  loss: 0.2316  decode.loss_ce: 0.2316  decode.acc_seg: 93.8910
+2023/05/20 16:04:37 - mmengine - INFO - per class results:
+2023/05/20 16:04:37 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 88.41 | 94.69 |
+|   person   | 92.94 | 95.84 |
++------------+-------+-------+
+2023/05/20 16:04:37 - mmengine - INFO - Iter(val) [60/60]    aAcc: 95.4100  mIoU: 90.6800  mAcc: 95.2600  data_time: 0.1513  time: 0.1868
+2023/05/20 16:04:51 - mmengine - INFO - Iter(train) [ 4400/12000]  lr: 5.6795e-03  eta: 0:22:50  time: 0.1784  data_time: 0.0168  memory: 1105  loss: 0.1908  decode.loss_ce: 0.1908  decode.acc_seg: 94.1104
+2023/05/20 16:05:22 - mmengine - INFO - per class results:
+2023/05/20 16:05:22 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.67 | 95.35 |
+|   person   | 95.05 | 97.65 |
++------------+-------+-------+
+2023/05/20 16:05:22 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.8000  mIoU: 93.3600  mAcc: 96.5000  data_time: 0.1312  time: 0.1833
+2023/05/20 16:05:22 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_3840.pth is removed
+2023/05/20 16:05:24 - mmengine - INFO - The best checkpoint with 96.8000 aAcc at 4560 iter is saved to best_aAcc_iter_4560.pth.
+2023/05/20 16:05:30 - mmengine - INFO - Iter(train) [ 4600/12000]  lr: 5.4607e-03  eta: 0:22:14  time: 0.1658  data_time: 0.0163  memory: 1105  loss: 0.1875  decode.loss_ce: 0.1875  decode.acc_seg: 95.3695
+2023/05/20 16:06:05 - mmengine - INFO - Iter(train) [ 4800/12000]  lr: 5.2409e-03  eta: 0:21:35  time: 0.1672  data_time: 0.0151  memory: 1105  loss: 0.2285  decode.loss_ce: 0.2285  decode.acc_seg: 93.4404
+2023/05/20 16:06:05 - mmengine - INFO - Saving checkpoint at 4800 iterations
+2023/05/20 16:06:10 - mmengine - INFO - per class results:
+2023/05/20 16:06:10 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 90.72 | 94.89 |
+|   person   | 94.47 |  97.3 |
++------------+-------+-------+
+2023/05/20 16:06:10 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.4100  mIoU: 92.6000  mAcc: 96.1000  data_time: 0.1473  time: 0.1871
+2023/05/20 16:06:45 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:06:45 - mmengine - INFO - Iter(train) [ 5000/12000]  lr: 5.0200e-03  eta: 0:20:58  time: 0.1759  data_time: 0.0160  memory: 1105  loss: 0.1634  decode.loss_ce: 0.1634  decode.acc_seg: 91.7666
+2023/05/20 16:06:56 - mmengine - INFO - per class results:
+2023/05/20 16:06:56 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.91 | 94.77 |
+|   person   | 95.25 | 98.18 |
++------------+-------+-------+
+2023/05/20 16:06:56 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.9200  mIoU: 93.5800  mAcc: 96.4700  data_time: 0.1484  time: 0.1942
+2023/05/20 16:06:56 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_4560.pth is removed
+2023/05/20 16:06:57 - mmengine - INFO - The best checkpoint with 96.9200 aAcc at 5040 iter is saved to best_aAcc_iter_5040.pth.
+2023/05/20 16:07:25 - mmengine - INFO - Iter(train) [ 5200/12000]  lr: 4.7981e-03  eta: 0:20:22  time: 0.1670  data_time: 0.0160  memory: 1105  loss: 0.1457  decode.loss_ce: 0.1457  decode.acc_seg: 95.3402
+2023/05/20 16:07:43 - mmengine - INFO - per class results:
+2023/05/20 16:07:43 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.71 | 94.45 |
+|   person   | 95.15 | 98.25 |
++------------+-------+-------+
+2023/05/20 16:07:43 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.8500  mIoU: 93.4300  mAcc: 96.3500  data_time: 0.1488  time: 0.1915
+2023/05/20 16:08:03 - mmengine - INFO - Iter(train) [ 5400/12000]  lr: 4.5749e-03  eta: 0:19:45  time: 0.1884  data_time: 0.0161  memory: 1105  loss: 0.2075  decode.loss_ce: 0.2075  decode.acc_seg: 90.5017
+2023/05/20 16:08:28 - mmengine - INFO - per class results:
+2023/05/20 16:08:28 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.93 | 95.26 |
+|   person   | 95.23 | 97.87 |
++------------+-------+-------+
+2023/05/20 16:08:28 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.9100  mIoU: 93.5800  mAcc: 96.5700  data_time: 0.1497  time: 0.1902
+2023/05/20 16:08:42 - mmengine - INFO - Iter(train) [ 5600/12000]  lr: 4.3505e-03  eta: 0:19:08  time: 0.1594  data_time: 0.0174  memory: 1105  loss: 0.2059  decode.loss_ce: 0.2059  decode.acc_seg: 90.2095
+2023/05/20 16:09:13 - mmengine - INFO - per class results:
+2023/05/20 16:09:13 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  91.3 | 94.76 |
+|   person   | 94.86 | 97.78 |
++------------+-------+-------+
+2023/05/20 16:09:13 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.6600  mIoU: 93.0800  mAcc: 96.2700  data_time: 0.1479  time: 0.1842
+2023/05/20 16:09:20 - mmengine - INFO - Iter(train) [ 5800/12000]  lr: 4.1248e-03  eta: 0:18:31  time: 0.1873  data_time: 0.0149  memory: 1105  loss: 0.2105  decode.loss_ce: 0.2105  decode.acc_seg: 89.8692
+2023/05/20 16:09:54 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:09:54 - mmengine - INFO - Iter(train) [ 6000/12000]  lr: 3.8977e-03  eta: 0:17:54  time: 0.1753  data_time: 0.0156  memory: 1105  loss: 0.1400  decode.loss_ce: 0.1400  decode.acc_seg: 93.9000
+2023/05/20 16:09:58 - mmengine - INFO - per class results:
+2023/05/20 16:09:58 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  91.9 | 95.18 |
+|   person   | 95.22 | 97.91 |
++------------+-------+-------+
+2023/05/20 16:09:58 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.9000  mIoU: 93.5600  mAcc: 96.5400  data_time: 0.1483  time: 0.1842
+2023/05/20 16:10:33 - mmengine - INFO - Iter(train) [ 6200/12000]  lr: 3.6691e-03  eta: 0:17:17  time: 0.1693  data_time: 0.0145  memory: 1105  loss: 0.1541  decode.loss_ce: 0.1541  decode.acc_seg: 94.6377
+2023/05/20 16:10:43 - mmengine - INFO - per class results:
+2023/05/20 16:10:43 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.55 | 95.79 |
+|   person   | 94.94 | 97.28 |
++------------+-------+-------+
+2023/05/20 16:10:43 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.7300  mIoU: 93.2400  mAcc: 96.5400  data_time: 0.1497  time: 0.1869
+2023/05/20 16:11:11 - mmengine - INFO - Iter(train) [ 6400/12000]  lr: 3.4388e-03  eta: 0:16:40  time: 0.1646  data_time: 0.0161  memory: 1105  loss: 0.1548  decode.loss_ce: 0.1548  decode.acc_seg: 89.0349
+2023/05/20 16:11:29 - mmengine - INFO - per class results:
+2023/05/20 16:11:29 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.65 | 95.66 |
+|   person   | 95.01 | 97.43 |
++------------+-------+-------+
+2023/05/20 16:11:29 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.7800  mIoU: 93.3300  mAcc: 96.5500  data_time: 0.1480  time: 0.1827
+2023/05/20 16:11:50 - mmengine - INFO - Iter(train) [ 6600/12000]  lr: 3.2067e-03  eta: 0:16:04  time: 0.1811  data_time: 0.0157  memory: 1105  loss: 0.2005  decode.loss_ce: 0.2005  decode.acc_seg: 91.9907
+2023/05/20 16:12:14 - mmengine - INFO - per class results:
+2023/05/20 16:12:14 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.79 | 94.97 |
+|   person   | 95.16 | 97.97 |
++------------+-------+-------+
+2023/05/20 16:12:14 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.8600  mIoU: 93.4700  mAcc: 96.4700  data_time: 0.1469  time: 0.1825
+2023/05/20 16:12:28 - mmengine - INFO - Iter(train) [ 6800/12000]  lr: 2.9727e-03  eta: 0:15:27  time: 0.1639  data_time: 0.0153  memory: 1105  loss: 0.1809  decode.loss_ce: 0.1809  decode.acc_seg: 90.4958
+2023/05/20 16:12:59 - mmengine - INFO - per class results:
+2023/05/20 16:12:59 - mmengine - INFO - 
++------------+-------+------+
+|   Class    |  IoU  | Acc  |
++------------+-------+------+
+| background | 91.92 | 94.9 |
+|   person   | 95.25 | 98.1 |
++------------+-------+------+
+2023/05/20 16:12:59 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.9200  mIoU: 93.5900  mAcc: 96.5000  data_time: 0.1492  time: 0.1849
+2023/05/20 16:13:06 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:13:06 - mmengine - INFO - Iter(train) [ 7000/12000]  lr: 2.7366e-03  eta: 0:14:51  time: 0.1716  data_time: 0.0155  memory: 1105  loss: 0.1747  decode.loss_ce: 0.1747  decode.acc_seg: 96.7498
+2023/05/20 16:13:41 - mmengine - INFO - Iter(train) [ 7200/12000]  lr: 2.4980e-03  eta: 0:14:15  time: 0.1765  data_time: 0.0155  memory: 1105  loss: 0.1759  decode.loss_ce: 0.1759  decode.acc_seg: 97.3438
+2023/05/20 16:13:41 - mmengine - INFO - Saving checkpoint at 7200 iterations
+2023/05/20 16:13:47 - mmengine - INFO - per class results:
+2023/05/20 16:13:47 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 91.91 | 94.78 |
+|   person   | 95.25 | 98.17 |
++------------+-------+-------+
+2023/05/20 16:13:47 - mmengine - INFO - Iter(val) [60/60]    aAcc: 96.9200  mIoU: 93.5800  mAcc: 96.4800  data_time: 0.1505  time: 0.2021
+2023/05/20 16:14:21 - mmengine - INFO - Iter(train) [ 7400/12000]  lr: 2.2569e-03  eta: 0:13:39  time: 0.1586  data_time: 0.0152  memory: 1105  loss: 0.1739  decode.loss_ce: 0.1739  decode.acc_seg: 90.8309
+2023/05/20 16:14:32 - mmengine - INFO - per class results:
+2023/05/20 16:14:32 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  92.3 | 95.41 |
+|   person   | 95.46 | 98.03 |
++------------+-------+-------+
+2023/05/20 16:14:32 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.0600  mIoU: 93.8800  mAcc: 96.7200  data_time: 0.1475  time: 0.1834
+2023/05/20 16:14:32 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_5040.pth is removed
+2023/05/20 16:14:33 - mmengine - INFO - The best checkpoint with 97.0600 aAcc at 7440 iter is saved to best_aAcc_iter_7440.pth.
+2023/05/20 16:15:01 - mmengine - INFO - Iter(train) [ 7600/12000]  lr: 2.0126e-03  eta: 0:13:04  time: 0.1807  data_time: 0.0146  memory: 1105  loss: 0.1451  decode.loss_ce: 0.1451  decode.acc_seg: 97.1413
+2023/05/20 16:15:19 - mmengine - INFO - per class results:
+2023/05/20 16:15:19 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.45 | 95.33 |
+|   person   | 95.56 | 98.18 |
++------------+-------+-------+
+2023/05/20 16:15:19 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1200  mIoU: 94.0000  mAcc: 96.7500  data_time: 0.1488  time: 0.1843
+2023/05/20 16:15:19 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_7440.pth is removed
+2023/05/20 16:15:21 - mmengine - INFO - The best checkpoint with 97.1200 aAcc at 7680 iter is saved to best_aAcc_iter_7680.pth.
+2023/05/20 16:15:41 - mmengine - INFO - Iter(train) [ 7800/12000]  lr: 1.7649e-03  eta: 0:12:29  time: 0.1839  data_time: 0.0149  memory: 1105  loss: 0.1607  decode.loss_ce: 0.1607  decode.acc_seg: 97.7492
+2023/05/20 16:16:06 - mmengine - INFO - per class results:
+2023/05/20 16:16:06 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.49 | 95.76 |
+|   person   | 95.55 | 97.93 |
++------------+-------+-------+
+2023/05/20 16:16:06 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1300  mIoU: 94.0200  mAcc: 96.8400  data_time: 0.1504  time: 0.1858
+2023/05/20 16:16:06 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_7680.pth is removed
+2023/05/20 16:16:07 - mmengine - INFO - The best checkpoint with 97.1300 aAcc at 7920 iter is saved to best_aAcc_iter_7920.pth.
+2023/05/20 16:16:21 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:16:21 - mmengine - INFO - Iter(train) [ 8000/12000]  lr: 1.5129e-03  eta: 0:11:53  time: 0.1785  data_time: 0.0154  memory: 1105  loss: 0.1853  decode.loss_ce: 0.1853  decode.acc_seg: 96.5969
+2023/05/20 16:16:52 - mmengine - INFO - per class results:
+2023/05/20 16:16:52 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.49 | 95.29 |
+|   person   | 95.59 | 98.23 |
++------------+-------+-------+
+2023/05/20 16:16:52 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1400  mIoU: 94.0400  mAcc: 96.7600  data_time: 0.1489  time: 0.1846
+2023/05/20 16:16:52 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_7920.pth is removed
+2023/05/20 16:16:54 - mmengine - INFO - The best checkpoint with 97.1400 aAcc at 8160 iter is saved to best_aAcc_iter_8160.pth.
+2023/05/20 16:17:01 - mmengine - INFO - Iter(train) [ 8200/12000]  lr: 1.2558e-03  eta: 0:11:18  time: 0.1585  data_time: 0.0162  memory: 1105  loss: 0.1619  decode.loss_ce: 0.1619  decode.acc_seg: 92.3718
+2023/05/20 16:17:36 - mmengine - INFO - Iter(train) [ 8400/12000]  lr: 9.9217e-04  eta: 0:10:42  time: 0.1682  data_time: 0.0152  memory: 1105  loss: 0.1730  decode.loss_ce: 0.1730  decode.acc_seg: 92.2907
+2023/05/20 16:17:39 - mmengine - INFO - per class results:
+2023/05/20 16:17:39 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.48 | 95.27 |
+|   person   | 95.58 | 98.23 |
++------------+-------+-------+
+2023/05/20 16:17:39 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1400  mIoU: 94.0300  mAcc: 96.7500  data_time: 0.1487  time: 0.1849
+2023/05/20 16:18:14 - mmengine - INFO - Iter(train) [ 8600/12000]  lr: 7.1939e-04  eta: 0:10:06  time: 0.1811  data_time: 0.0149  memory: 1105  loss: 0.1372  decode.loss_ce: 0.1372  decode.acc_seg: 95.2149
+2023/05/20 16:18:25 - mmengine - INFO - per class results:
+2023/05/20 16:18:25 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.25 | 95.83 |
+|   person   | 95.39 | 97.72 |
++------------+-------+-------+
+2023/05/20 16:18:25 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.0200  mIoU: 93.8200  mAcc: 96.7800  data_time: 0.1495  time: 0.1857
+2023/05/20 16:18:53 - mmengine - INFO - Iter(train) [ 8800/12000]  lr: 4.3192e-04  eta: 0:09:30  time: 0.1869  data_time: 0.0173  memory: 1105  loss: 0.1668  decode.loss_ce: 0.1668  decode.acc_seg: 93.6055
+2023/05/20 16:19:10 - mmengine - INFO - per class results:
+2023/05/20 16:19:10 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.62 | 95.32 |
+|   person   | 95.67 | 98.29 |
++------------+-------+-------+
+2023/05/20 16:19:10 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1900  mIoU: 94.1400  mAcc: 96.8000  data_time: 0.1491  time: 0.1809
+2023/05/20 16:19:10 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_8160.pth is removed
+2023/05/20 16:19:12 - mmengine - INFO - The best checkpoint with 97.1900 aAcc at 8880 iter is saved to best_aAcc_iter_8880.pth.
+2023/05/20 16:19:33 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:19:33 - mmengine - INFO - Iter(train) [ 9000/12000]  lr: 1.0000e-04  eta: 0:08:55  time: 0.1894  data_time: 0.0165  memory: 1105  loss: 0.1772  decode.loss_ce: 0.1772  decode.acc_seg: 94.9469
+2023/05/20 16:19:57 - mmengine - INFO - per class results:
+2023/05/20 16:19:57 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.55 | 95.38 |
+|   person   | 95.62 | 98.21 |
++------------+-------+-------+
+2023/05/20 16:19:57 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1600  mIoU: 94.0900  mAcc: 96.7900  data_time: 0.1469  time: 0.1889
+2023/05/20 16:20:11 - mmengine - INFO - Iter(train) [ 9200/12000]  lr: 9.4008e-05  eta: 0:08:19  time: 0.1807  data_time: 0.0163  memory: 1105  loss: 0.1721  decode.loss_ce: 0.1721  decode.acc_seg: 89.8153
+2023/05/20 16:20:43 - mmengine - INFO - per class results:
+2023/05/20 16:20:43 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.46 | 95.59 |
+|   person   | 95.55 | 98.02 |
++------------+-------+-------+
+2023/05/20 16:20:43 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1200  mIoU: 94.0000  mAcc: 96.8000  data_time: 0.1449  time: 0.1802
+2023/05/20 16:20:50 - mmengine - INFO - Iter(train) [ 9400/12000]  lr: 8.7942e-05  eta: 0:07:43  time: 0.1686  data_time: 0.0148  memory: 1104  loss: 0.1312  decode.loss_ce: 0.1312  decode.acc_seg: 93.3678
+2023/05/20 16:21:24 - mmengine - INFO - Iter(train) [ 9600/12000]  lr: 8.1830e-05  eta: 0:07:07  time: 0.1899  data_time: 0.0149  memory: 1105  loss: 0.1360  decode.loss_ce: 0.1360  decode.acc_seg: 94.9499
+2023/05/20 16:21:24 - mmengine - INFO - Saving checkpoint at 9600 iterations
+2023/05/20 16:21:30 - mmengine - INFO - per class results:
+2023/05/20 16:21:30 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.53 | 95.37 |
+|   person   | 95.61 |  98.2 |
++------------+-------+-------+
+2023/05/20 16:21:30 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1600  mIoU: 94.0700  mAcc: 96.7900  data_time: 0.1474  time: 0.1826
+2023/05/20 16:22:05 - mmengine - INFO - Iter(train) [ 9800/12000]  lr: 7.5666e-05  eta: 0:06:31  time: 0.1740  data_time: 0.0154  memory: 1105  loss: 0.1547  decode.loss_ce: 0.1547  decode.acc_seg: 91.6086
+2023/05/20 16:22:16 - mmengine - INFO - per class results:
+2023/05/20 16:22:16 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.34 | 95.55 |
+|   person   | 95.47 | 97.96 |
++------------+-------+-------+
+2023/05/20 16:22:16 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.0700  mIoU: 93.9100  mAcc: 96.7600  data_time: 0.1467  time: 0.1810
+2023/05/20 16:22:44 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:22:44 - mmengine - INFO - Iter(train) [10000/12000]  lr: 6.9446e-05  eta: 0:05:56  time: 0.1833  data_time: 0.0151  memory: 1105  loss: 0.1560  decode.loss_ce: 0.1560  decode.acc_seg: 96.3723
+2023/05/20 16:23:01 - mmengine - INFO - per class results:
+2023/05/20 16:23:01 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.42 | 95.72 |
+|   person   | 95.51 | 97.91 |
++------------+-------+-------+
+2023/05/20 16:23:01 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1000  mIoU: 93.9700  mAcc: 96.8100  data_time: 0.1489  time: 0.1897
+2023/05/20 16:23:22 - mmengine - INFO - Iter(train) [10200/12000]  lr: 6.3164e-05  eta: 0:05:20  time: 0.1773  data_time: 0.0152  memory: 1105  loss: 0.1496  decode.loss_ce: 0.1496  decode.acc_seg: 96.2774
+2023/05/20 16:23:46 - mmengine - INFO - per class results:
+2023/05/20 16:23:46 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.39 |  95.6 |
+|   person   |  95.5 | 97.96 |
++------------+-------+-------+
+2023/05/20 16:23:46 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.0900  mIoU: 93.9400  mAcc: 96.7800  data_time: 0.1479  time: 0.1807
+2023/05/20 16:24:00 - mmengine - INFO - Iter(train) [10400/12000]  lr: 5.6811e-05  eta: 0:04:44  time: 0.1611  data_time: 0.0144  memory: 1105  loss: 0.1385  decode.loss_ce: 0.1385  decode.acc_seg: 94.5701
+2023/05/20 16:24:31 - mmengine - INFO - per class results:
+2023/05/20 16:24:31 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.36 | 95.72 |
+|   person   | 95.47 | 97.87 |
++------------+-------+-------+
+2023/05/20 16:24:31 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.0700  mIoU: 93.9200  mAcc: 96.7900  data_time: 0.1480  time: 0.1807
+2023/05/20 16:24:38 - mmengine - INFO - Iter(train) [10600/12000]  lr: 5.0377e-05  eta: 0:04:08  time: 0.1648  data_time: 0.0152  memory: 1105  loss: 0.1645  decode.loss_ce: 0.1645  decode.acc_seg: 96.4803
+2023/05/20 16:25:12 - mmengine - INFO - Iter(train) [10800/12000]  lr: 4.3851e-05  eta: 0:03:33  time: 0.1785  data_time: 0.0152  memory: 1105  loss: 0.1562  decode.loss_ce: 0.1562  decode.acc_seg: 93.4203
+2023/05/20 16:25:16 - mmengine - INFO - per class results:
+2023/05/20 16:25:16 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.33 | 95.81 |
+|   person   | 95.45 | 97.79 |
++------------+-------+-------+
+2023/05/20 16:25:16 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.0600  mIoU: 93.8900  mAcc: 96.8000  data_time: 0.1481  time: 0.1819
+2023/05/20 16:25:50 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:25:50 - mmengine - INFO - Iter(train) [11000/12000]  lr: 3.7215e-05  eta: 0:02:57  time: 0.1755  data_time: 0.0154  memory: 1105  loss: 0.1424  decode.loss_ce: 0.1424  decode.acc_seg: 92.3353
+2023/05/20 16:26:01 - mmengine - INFO - per class results:
+2023/05/20 16:26:01 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.51 | 95.78 |
+|   person   | 95.56 | 97.92 |
++------------+-------+-------+
+2023/05/20 16:26:01 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1300  mIoU: 94.0400  mAcc: 96.8500  data_time: 0.1336  time: 0.1832
+2023/05/20 16:26:29 - mmengine - INFO - Iter(train) [11200/12000]  lr: 3.0444e-05  eta: 0:02:22  time: 0.1785  data_time: 0.0152  memory: 1105  loss: 0.1705  decode.loss_ce: 0.1705  decode.acc_seg: 94.8291
+2023/05/20 16:26:46 - mmengine - INFO - per class results:
+2023/05/20 16:26:46 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.65 | 95.51 |
+|   person   | 95.67 | 98.19 |
++------------+-------+-------+
+2023/05/20 16:26:46 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.2000  mIoU: 94.1600  mAcc: 96.8500  data_time: 0.1483  time: 0.1940
+2023/05/20 16:26:46 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/workdirs/dappm/best_aAcc_iter_8880.pth is removed
+2023/05/20 16:26:47 - mmengine - INFO - The best checkpoint with 97.2000 aAcc at 11280 iter is saved to best_aAcc_iter_11280.pth.
+2023/05/20 16:27:08 - mmengine - INFO - Iter(train) [11400/12000]  lr: 2.3499e-05  eta: 0:01:46  time: 0.1675  data_time: 0.0149  memory: 1105  loss: 0.1668  decode.loss_ce: 0.1668  decode.acc_seg: 90.2095
+2023/05/20 16:27:33 - mmengine - INFO - per class results:
+2023/05/20 16:27:33 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.65 | 95.43 |
+|   person   | 95.67 | 98.24 |
++------------+-------+-------+
+2023/05/20 16:27:33 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.2000  mIoU: 94.1600  mAcc: 96.8300  data_time: 0.1520  time: 0.1849
+2023/05/20 16:27:47 - mmengine - INFO - Iter(train) [11600/12000]  lr: 1.6315e-05  eta: 0:01:11  time: 0.1613  data_time: 0.0152  memory: 1105  loss: 0.1373  decode.loss_ce: 0.1373  decode.acc_seg: 91.3400
+2023/05/20 16:28:18 - mmengine - INFO - per class results:
+2023/05/20 16:28:18 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.52 | 95.72 |
+|   person   | 95.57 | 97.97 |
++------------+-------+-------+
+2023/05/20 16:28:19 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1400  mIoU: 94.0500  mAcc: 96.8500  data_time: 0.1492  time: 0.1822
+2023/05/20 16:28:25 - mmengine - INFO - Iter(train) [11800/12000]  lr: 8.7428e-06  eta: 0:00:35  time: 0.1772  data_time: 0.0158  memory: 1105  loss: 0.1487  decode.loss_ce: 0.1487  decode.acc_seg: 95.4217
+2023/05/20 16:29:00 - mmengine - INFO - Exp name: mv3+pappm+cus_20230520_155009
+2023/05/20 16:29:00 - mmengine - INFO - Iter(train) [12000/12000]  lr: 0.0000e+00  eta: 0:00:00  time: 0.1576  data_time: 0.0154  memory: 1105  loss: 0.1562  decode.loss_ce: 0.1562  decode.acc_seg: 95.9237
+2023/05/20 16:29:00 - mmengine - INFO - Saving checkpoint at 12000 iterations
+2023/05/20 16:29:05 - mmengine - INFO - per class results:
+2023/05/20 16:29:05 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 92.53 | 95.66 |
+|   person   | 95.58 | 98.02 |
++------------+-------+-------+
+2023/05/20 16:29:05 - mmengine - INFO - Iter(val) [60/60]    aAcc: 97.1500  mIoU: 94.0600  mAcc: 96.8400  data_time: 0.1477  time: 0.1817

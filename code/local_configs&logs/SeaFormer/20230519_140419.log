@@ -1,0 +1,1651 @@
+2023/05/19 14:04:23 - mmengine - INFO - 
+------------------------------------------------------------
+System environment:
+    sys.platform: linux
+    Python: 3.8.7 (default, Feb  5 2021, 16:56:08) [GCC 5.4.0 20160609]
+    CUDA available: True
+    numpy_random_seed: 304
+    GPU 0,1,2,3,4,5,6,7,8,9: NVIDIA GeForce RTX 2080 Ti
+    CUDA_HOME: /usr/local/cuda-11.3
+    NVCC: Cuda compilation tools, release 11.3, V11.3.109
+    GCC: gcc (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609
+    PyTorch: 1.12.1+cu113
+    PyTorch compiling details: PyTorch built with:
+  - GCC 9.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191122 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.6.0 (Git Hash 52b5f107dd9cf10910aaa19cb47f3abf9b349815)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.3
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86
+  - CuDNN 8.3.2  (built against CUDA 11.5)
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.3, CUDNN_VERSION=8.3.2, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -fabi-version=11 -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.12.1, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+    TorchVision: 0.13.1+cu113
+    OpenCV: 4.6.0
+    MMEngine: 0.7.2
+
+Runtime environment:
+    cudnn_benchmark: True
+    mp_cfg: {'mp_start_method': 'fork', 'opencv_num_threads': 0}
+    dist_cfg: {'backend': 'nccl'}
+    seed: 304
+    Distributed launcher: pytorch
+    Distributed training: True
+    GPU number: 4
+------------------------------------------------------------
+
+2023/05/19 14:04:24 - mmengine - INFO - Config:
+dataset_type = 'PortraitDataset'
+data_root = 'data/portrait'
+crop_size = (512, 512)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(
+        type='RandomResize',
+        scale=(1024, 1024),
+        ratio_range=(0.5, 1.5),
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=(512, 512), cat_max_ratio=0.75),
+    dict(type='RandomFlip', prob=0.5),
+    dict(type='PhotoMetricDistortion'),
+    dict(type='PackSegInputs')
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='Resize', scale=(1024, 512), keep_ratio=True),
+    dict(type='LoadAnnotations', reduce_zero_label=False),
+    dict(type='PackSegInputs')
+]
+img_ratios = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+tta_pipeline = [
+    dict(type='LoadImageFromFile', backend_args=None),
+    dict(
+        type='TestTimeAug',
+        transforms=[[{
+            'type': 'Resize',
+            'scale_factor': 0.5,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 0.75,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.0,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.25,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.5,
+            'keep_ratio': True
+        }, {
+            'type': 'Resize',
+            'scale_factor': 1.75,
+            'keep_ratio': True
+        }],
+                    [{
+                        'type': 'RandomFlip',
+                        'prob': 0.0,
+                        'direction': 'horizontal'
+                    }, {
+                        'type': 'RandomFlip',
+                        'prob': 1.0,
+                        'direction': 'horizontal'
+                    }], [{
+                        'type': 'LoadAnnotations'
+                    }], [{
+                        'type': 'PackSegInputs'
+                    }]])
+]
+train_dataloader = dict(
+    batch_size=4,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='InfiniteSampler', shuffle=True),
+    dataset=dict(
+        type='PortraitDataset',
+        data_root='data/portrait',
+        data_prefix=dict(img_path='train/img', seg_map_path='train/ann'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', reduce_zero_label=False),
+            dict(
+                type='RandomResize',
+                scale=(1024, 1024),
+                ratio_range=(0.5, 1.5),
+                keep_ratio=True),
+            dict(type='RandomCrop', crop_size=(512, 512), cat_max_ratio=0.75),
+            dict(type='RandomFlip', prob=0.5),
+            dict(type='PhotoMetricDistortion'),
+            dict(type='PackSegInputs')
+        ]))
+val_dataloader = dict(
+    batch_size=1,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='PortraitDataset',
+        data_root='data/portrait',
+        data_prefix=dict(img_path='val/img', seg_map_path='val/ann'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', scale=(1024, 512), keep_ratio=True),
+            dict(type='LoadAnnotations', reduce_zero_label=False),
+            dict(type='PackSegInputs')
+        ]))
+test_dataloader = dict(
+    batch_size=1,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(type='DefaultSampler', shuffle=False),
+    dataset=dict(
+        type='PortraitDataset',
+        data_root='data/portrait',
+        data_prefix=dict(img_path='val/img', seg_map_path='val/ann'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='Resize', scale=(1024, 512), keep_ratio=True),
+            dict(type='LoadAnnotations', reduce_zero_label=False),
+            dict(type='PackSegInputs')
+        ]))
+val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
+test_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
+default_scope = 'mmseg'
+env_cfg = dict(
+    cudnn_benchmark=True,
+    mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0),
+    dist_cfg=dict(backend='nccl'))
+vis_backends = [
+    dict(type='LocalVisBackend'),
+    dict(type='TensorboardVisBackend')
+]
+visualizer = dict(
+    type='SegLocalVisualizer',
+    vis_backends=[
+        dict(type='LocalVisBackend'),
+        dict(type='TensorboardVisBackend')
+    ],
+    name='visualizer')
+log_processor = dict(by_epoch=False)
+log_level = 'INFO'
+load_from = None
+resume = False
+tta_model = dict(type='SegTTAModel')
+model_cfgs = dict(
+    cfg1=[[3, 1, 16, 1], [3, 4, 16, 2], [3, 3, 16, 1]],
+    cfg2=[[5, 3, 32, 2], [5, 3, 32, 1]],
+    cfg3=[[3, 3, 64, 2], [3, 3, 64, 1]],
+    cfg4=[[5, 3, 128, 2]],
+    cfg5=[[3, 6, 160, 2]],
+    channels=[16, 16, 32, 64, 128, 160],
+    key_dims=[16, 24],
+    depths=[2, 2],
+    emb_dims=[128, 160],
+    num_heads=4,
+    drop_path_rate=0.1)
+data_preprocessor = dict(
+    type='SegDataPreProcessor',
+    mean=[111.95, 117.35, 126.66],
+    std=[75.79, 75.87, 78.57],
+    bgr_to_rgb=True,
+    pad_val=0,
+    seg_pad_val=255,
+    size=(512, 512))
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+model = dict(
+    type='EncoderDecoder',
+    data_preprocessor=dict(
+        type='SegDataPreProcessor',
+        mean=[111.95, 117.35, 126.66],
+        std=[75.79, 75.87, 78.57],
+        bgr_to_rgb=True,
+        pad_val=0,
+        seg_pad_val=255,
+        size=(512, 512)),
+    backbone=dict(
+        type='SeaFormer1',
+        cfgs=[[[3, 1, 16, 1], [3, 4, 16, 2], [3, 3, 16, 1]],
+              [[5, 3, 32, 2], [5, 3, 32, 1]], [[3, 3, 64, 2], [3, 3, 64, 1]],
+              [[5, 3, 128, 2]], [[3, 6, 160, 2]]],
+        channels=[16, 16, 32, 64, 128, 160],
+        emb_dims=[128, 160],
+        key_dims=[16, 24],
+        depths=[2, 2],
+        num_heads=4,
+        drop_path_rate=0.1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        init_cfg=dict(
+            type='Pretrained', checkpoint='SeaFormer_T_cls_68.1.pth')),
+    decode_head=dict(
+        type='LightHead',
+        in_channels=[32, 128, 160],
+        in_index=[0, 1, 2],
+        channels=96,
+        dropout_ratio=0.1,
+        embed_dims=[64, 96],
+        num_classes=2,
+        is_dw=True,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        align_corners=False,
+        loss_decode=dict(
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
+    train_cfg=dict(),
+    test_cfg=dict(mode='whole'))
+iters = 12000
+param_scheduler = [
+    dict(type='LinearLR', by_epoch=False, start_factor=0.1, begin=0, end=300),
+    dict(
+        type='PolyLR',
+        eta_min=0.0001,
+        power=0.9,
+        begin=300,
+        end=9000,
+        by_epoch=False),
+    dict(
+        type='PolyLR',
+        eta_min=0,
+        power=0.9,
+        begin=9000,
+        end=12000,
+        by_epoch=False)
+]
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
+optim_wrapper = dict(
+    type='OptimWrapper',
+    optimizer=dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005))
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=12000, val_interval=240)
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
+default_hooks = dict(
+    timer=dict(type='IterTimerHook'),
+    logger=dict(type='LoggerHook', interval=200, log_metric_by_epoch=False),
+    param_scheduler=dict(type='ParamSchedulerHook'),
+    checkpoint=dict(
+        type='CheckpointHook',
+        by_epoch=False,
+        save_best='auto',
+        max_keep_ckpts=2,
+        interval=2400),
+    sampler_seed=dict(type='DistSamplerSeedHook'),
+    visualization=dict(type='SegVisualizationHook', draw=True))
+randomness = dict(seed=304)
+launcher = 'pytorch'
+work_dir = './work_dirs/seacfg'
+
+2023/05/19 14:04:27 - mmengine - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+before_train:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) DistSamplerSeedHook                
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) IterTimerHook                      
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_val_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_val_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+(LOW         ) ParamSchedulerHook                 
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+after_train:
+(VERY_LOW    ) CheckpointHook                     
+ -------------------- 
+before_test_epoch:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+before_test_iter:
+(NORMAL      ) IterTimerHook                      
+ -------------------- 
+after_test_iter:
+(NORMAL      ) IterTimerHook                      
+(NORMAL      ) SegVisualizationHook               
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_test_epoch:
+(VERY_HIGH   ) RuntimeInfoHook                    
+(NORMAL      ) IterTimerHook                      
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+after_run:
+(BELOW_NORMAL) LoggerHook                         
+ -------------------- 
+2023/05/19 14:04:29 - mmengine - WARNING - The prefix is not set in metric class IoUMetric.
+2023/05/19 14:04:31 - mmengine - INFO - Loads checkpoint by local backend from path: SeaFormer_T_cls_68.1.pth
+Name of parameter - Initialization information
+
+backbone.smb1.stem_block.0.c.weight - torch.Size([16, 3, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.stem_block.0.bn.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.stem_block.0.bn.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer1.conv.0.c.weight - torch.Size([16, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer1.conv.0.bn.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer1.conv.0.bn.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer1.conv.2.c.weight - torch.Size([16, 16, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer1.conv.2.bn.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer1.conv.2.bn.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer2.conv.0.c.weight - torch.Size([64, 16, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer2.conv.0.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer2.conv.0.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer2.conv.2.c.weight - torch.Size([64, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer2.conv.2.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer2.conv.2.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer2.conv.4.c.weight - torch.Size([16, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer2.conv.4.bn.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer2.conv.4.bn.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer3.conv.0.c.weight - torch.Size([48, 16, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer3.conv.0.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer3.conv.0.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer3.conv.2.c.weight - torch.Size([48, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer3.conv.2.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer3.conv.2.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer3.conv.4.c.weight - torch.Size([16, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb1.layer3.conv.4.bn.weight - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb1.layer3.conv.4.bn.bias - torch.Size([16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer1.conv.0.c.weight - torch.Size([48, 16, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb2.layer1.conv.0.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer1.conv.0.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer1.conv.2.c.weight - torch.Size([48, 1, 5, 5]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb2.layer1.conv.2.bn.weight - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer1.conv.2.bn.bias - torch.Size([48]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer1.conv.4.c.weight - torch.Size([32, 48, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb2.layer1.conv.4.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer1.conv.4.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer2.conv.0.c.weight - torch.Size([96, 32, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb2.layer2.conv.0.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer2.conv.0.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer2.conv.2.c.weight - torch.Size([96, 1, 5, 5]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb2.layer2.conv.2.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer2.conv.2.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer2.conv.4.c.weight - torch.Size([32, 96, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb2.layer2.conv.4.bn.weight - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb2.layer2.conv.4.bn.bias - torch.Size([32]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer1.conv.0.c.weight - torch.Size([96, 32, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb3.layer1.conv.0.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer1.conv.0.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer1.conv.2.c.weight - torch.Size([96, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb3.layer1.conv.2.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer1.conv.2.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer1.conv.4.c.weight - torch.Size([64, 96, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb3.layer1.conv.4.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer1.conv.4.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer2.conv.0.c.weight - torch.Size([192, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb3.layer2.conv.0.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer2.conv.0.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer2.conv.2.c.weight - torch.Size([192, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb3.layer2.conv.2.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer2.conv.2.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer2.conv.4.c.weight - torch.Size([64, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb3.layer2.conv.4.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb3.layer2.conv.4.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb4.layer1.conv.0.c.weight - torch.Size([192, 64, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb4.layer1.conv.0.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb4.layer1.conv.0.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb4.layer1.conv.2.c.weight - torch.Size([192, 1, 5, 5]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb4.layer1.conv.2.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb4.layer1.conv.2.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb4.layer1.conv.4.c.weight - torch.Size([128, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb4.layer1.conv.4.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb4.layer1.conv.4.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb5.layer1.conv.0.c.weight - torch.Size([768, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb5.layer1.conv.0.bn.weight - torch.Size([768]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb5.layer1.conv.0.bn.bias - torch.Size([768]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb5.layer1.conv.2.c.weight - torch.Size([768, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb5.layer1.conv.2.bn.weight - torch.Size([768]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb5.layer1.conv.2.bn.bias - torch.Size([768]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb5.layer1.conv.4.c.weight - torch.Size([160, 768, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.smb5.layer1.conv.4.bn.weight - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.smb5.layer1.conv.4.bn.bias - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.to_q.c.weight - torch.Size([64, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.to_q.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.to_q.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.to_k.c.weight - torch.Size([64, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.to_k.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.to_k.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.to_v.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.to_v.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.to_v.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.proj.1.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.proj.1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.proj.1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.proj_encode_row.1.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.proj_encode_row.1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.proj_encode_row.1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.pos_emb_rowq.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.pos_emb_rowk.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.proj_encode_column.1.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.proj_encode_column.1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.proj_encode_column.1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.pos_emb_columnq.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.pos_emb_columnk.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.dwconv.c.weight - torch.Size([256, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.dwconv.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.dwconv.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.pwconv.c.weight - torch.Size([128, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.attn.pwconv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.attn.pwconv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.mlp.fc1.c.weight - torch.Size([256, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.mlp.fc1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.mlp.fc1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.mlp.dwconv.weight - torch.Size([256, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.mlp.dwconv.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.mlp.fc2.c.weight - torch.Size([128, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.0.mlp.fc2.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.0.mlp.fc2.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.to_q.c.weight - torch.Size([64, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.to_q.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.to_q.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.to_k.c.weight - torch.Size([64, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.to_k.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.to_k.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.to_v.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.to_v.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.to_v.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.proj.1.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.proj.1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.proj.1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.proj_encode_row.1.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.proj_encode_row.1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.proj_encode_row.1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.pos_emb_rowq.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.pos_emb_rowk.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.proj_encode_column.1.c.weight - torch.Size([128, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.proj_encode_column.1.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.proj_encode_column.1.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.pos_emb_columnq.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.pos_emb_columnk.pos_embed - torch.Size([1, 64, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.dwconv.c.weight - torch.Size([256, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.dwconv.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.dwconv.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.pwconv.c.weight - torch.Size([128, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.attn.pwconv.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.attn.pwconv.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.mlp.fc1.c.weight - torch.Size([256, 128, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.mlp.fc1.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.mlp.fc1.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.mlp.dwconv.weight - torch.Size([256, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.mlp.dwconv.bias - torch.Size([256]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.mlp.fc2.c.weight - torch.Size([128, 256, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans1.transformer_blocks.1.mlp.fc2.bn.weight - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans1.transformer_blocks.1.mlp.fc2.bn.bias - torch.Size([128]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.to_q.c.weight - torch.Size([96, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.to_q.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.to_q.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.to_k.c.weight - torch.Size([96, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.to_k.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.to_k.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.to_v.c.weight - torch.Size([192, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.to_v.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.to_v.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.proj.1.c.weight - torch.Size([160, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.proj.1.bn.weight - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.proj.1.bn.bias - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.proj_encode_row.1.c.weight - torch.Size([192, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.proj_encode_row.1.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.proj_encode_row.1.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.pos_emb_rowq.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.pos_emb_rowk.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.proj_encode_column.1.c.weight - torch.Size([192, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.proj_encode_column.1.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.proj_encode_column.1.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.pos_emb_columnq.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.pos_emb_columnk.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.dwconv.c.weight - torch.Size([384, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.dwconv.bn.weight - torch.Size([384]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.dwconv.bn.bias - torch.Size([384]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.pwconv.c.weight - torch.Size([160, 384, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.attn.pwconv.bn.weight - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.attn.pwconv.bn.bias - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.mlp.fc1.c.weight - torch.Size([640, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.mlp.fc1.bn.weight - torch.Size([640]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.mlp.fc1.bn.bias - torch.Size([640]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.mlp.dwconv.weight - torch.Size([640, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.mlp.dwconv.bias - torch.Size([640]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.mlp.fc2.c.weight - torch.Size([160, 640, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.0.mlp.fc2.bn.weight - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.0.mlp.fc2.bn.bias - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.to_q.c.weight - torch.Size([96, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.to_q.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.to_q.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.to_k.c.weight - torch.Size([96, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.to_k.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.to_k.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.to_v.c.weight - torch.Size([192, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.to_v.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.to_v.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.proj.1.c.weight - torch.Size([160, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.proj.1.bn.weight - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.proj.1.bn.bias - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.proj_encode_row.1.c.weight - torch.Size([192, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.proj_encode_row.1.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.proj_encode_row.1.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.pos_emb_rowq.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.pos_emb_rowk.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.proj_encode_column.1.c.weight - torch.Size([192, 192, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.proj_encode_column.1.bn.weight - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.proj_encode_column.1.bn.bias - torch.Size([192]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.pos_emb_columnq.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.pos_emb_columnk.pos_embed - torch.Size([1, 96, 16]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.dwconv.c.weight - torch.Size([384, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.dwconv.bn.weight - torch.Size([384]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.dwconv.bn.bias - torch.Size([384]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.pwconv.c.weight - torch.Size([160, 384, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.attn.pwconv.bn.weight - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.attn.pwconv.bn.bias - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.mlp.fc1.c.weight - torch.Size([640, 160, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.mlp.fc1.bn.weight - torch.Size([640]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.mlp.fc1.bn.bias - torch.Size([640]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.mlp.dwconv.weight - torch.Size([640, 1, 3, 3]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.mlp.dwconv.bias - torch.Size([640]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.mlp.fc2.c.weight - torch.Size([160, 640, 1, 1]): 
+Initialized by user-defined `init_weights` in SeaFormer1  
+
+backbone.trans2.transformer_blocks.1.mlp.fc2.bn.weight - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+backbone.trans2.transformer_blocks.1.mlp.fc2.bn.bias - torch.Size([160]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.conv_seg.weight - torch.Size([2, 96, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.conv_seg.bias - torch.Size([2]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.linear_fuse.conv.weight - torch.Size([96, 1, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.linear_fuse.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.linear_fuse.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse1.local_embedding.conv.weight - torch.Size([64, 32, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse1.local_embedding.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse1.local_embedding.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse1.global_act.conv.weight - torch.Size([64, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse1.global_act.bn.weight - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse1.global_act.bn.bias - torch.Size([64]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse2.local_embedding.conv.weight - torch.Size([96, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse2.local_embedding.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse2.local_embedding.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse2.global_act.conv.weight - torch.Size([96, 160, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse2.global_act.bn.weight - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fuse2.global_act.bn.bias - torch.Size([96]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+2023/05/19 14:04:31 - mmengine - WARNING - "FileClient" will be deprecated in future. Please use io functions in https://mmengine.readthedocs.io/en/latest/api/fileio.html#file-io
+2023/05/19 14:04:31 - mmengine - WARNING - "HardDiskBackend" is the alias of "LocalBackend" and the former will be deprecated in future.
+2023/05/19 14:04:31 - mmengine - INFO - Checkpoints will be saved to /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg.
+2023/05/19 14:05:01 - mmengine - INFO - Iter(train) [  200/12000]  lr: 6.9900e-03  eta: 0:29:50  time: 0.1434  data_time: 0.0071  memory: 861  loss: 0.5414  decode.loss_ce: 0.5414  decode.acc_seg: 84.1248
+2023/05/19 14:05:13 - mmengine - INFO - per class results:
+2023/05/19 14:05:13 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 57.46 | 67.62 |
+|   person   | 75.33 | 89.64 |
++------------+-------+-------+
+2023/05/19 14:05:13 - mmengine - INFO - Iter(val) [60/60]    aAcc: 81.5000  mIoU: 66.4000  mAcc: 78.6300  data_time: 0.0685  time: 0.1229
+2023/05/19 14:05:14 - mmengine - INFO - The best checkpoint with 81.5000 aAcc at 240 iter is saved to best_aAcc_iter_240.pth.
+2023/05/19 14:05:37 - mmengine - INFO - Iter(train) [  400/12000]  lr: 9.8985e-03  eta: 0:28:56  time: 0.1360  data_time: 0.0081  memory: 856  loss: 0.4731  decode.loss_ce: 0.4731  decode.acc_seg: 87.1259
+2023/05/19 14:05:50 - mmengine - INFO - per class results:
+2023/05/19 14:05:50 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 61.04 | 68.49 |
+|   person   | 78.37 | 92.85 |
++------------+-------+-------+
+2023/05/19 14:05:50 - mmengine - INFO - Iter(val) [60/60]    aAcc: 83.8400  mIoU: 69.7000  mAcc: 80.6700  data_time: 0.0735  time: 0.0903
+2023/05/19 14:05:50 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_240.pth is removed
+2023/05/19 14:05:52 - mmengine - INFO - The best checkpoint with 83.8400 aAcc at 480 iter is saved to best_aAcc_iter_480.pth.
+2023/05/19 14:05:53 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:06:08 - mmengine - INFO - Iter(train) [  600/12000]  lr: 9.6932e-03  eta: 0:28:20  time: 0.1348  data_time: 0.0074  memory: 650  loss: 0.4575  decode.loss_ce: 0.4575  decode.acc_seg: 70.8209
+2023/05/19 14:06:27 - mmengine - INFO - per class results:
+2023/05/19 14:06:27 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 64.08 | 69.33 |
+|   person   | 80.69 |  95.2 |
++------------+-------+-------+
+2023/05/19 14:06:27 - mmengine - INFO - Iter(val) [60/60]    aAcc: 85.6400  mIoU: 72.3800  mAcc: 82.2600  data_time: 0.0613  time: 0.0879
+2023/05/19 14:06:27 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_480.pth is removed
+2023/05/19 14:06:28 - mmengine - INFO - The best checkpoint with 85.6400 aAcc at 720 iter is saved to best_aAcc_iter_720.pth.
+2023/05/19 14:06:39 - mmengine - INFO - Iter(train) [  800/12000]  lr: 9.4874e-03  eta: 0:27:33  time: 0.1349  data_time: 0.0072  memory: 650  loss: 0.4380  decode.loss_ce: 0.4380  decode.acc_seg: 69.1978
+2023/05/19 14:07:03 - mmengine - INFO - per class results:
+2023/05/19 14:07:03 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 69.89 |  78.3 |
+|   person   | 82.46 | 92.95 |
++------------+-------+-------+
+2023/05/19 14:07:03 - mmengine - INFO - Iter(val) [60/60]    aAcc: 87.5300  mIoU: 76.1700  mAcc: 85.6200  data_time: 0.0580  time: 0.0824
+2023/05/19 14:07:03 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_720.pth is removed
+2023/05/19 14:07:04 - mmengine - INFO - The best checkpoint with 87.5300 aAcc at 960 iter is saved to best_aAcc_iter_960.pth.
+2023/05/19 14:07:09 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:07:09 - mmengine - INFO - Iter(train) [ 1000/12000]  lr: 9.2811e-03  eta: 0:26:54  time: 0.1354  data_time: 0.0074  memory: 650  loss: 0.4769  decode.loss_ce: 0.4769  decode.acc_seg: 76.5575
+2023/05/19 14:07:37 - mmengine - INFO - Iter(train) [ 1200/12000]  lr: 9.0742e-03  eta: 0:26:04  time: 0.1334  data_time: 0.0063  memory: 650  loss: 0.5091  decode.loss_ce: 0.5091  decode.acc_seg: 84.0866
+2023/05/19 14:07:38 - mmengine - INFO - per class results:
+2023/05/19 14:07:38 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 68.25 | 73.03 |
+|   person   |  82.8 |  95.9 |
++------------+-------+-------+
+2023/05/19 14:07:38 - mmengine - INFO - Iter(val) [60/60]    aAcc: 87.4400  mIoU: 75.5300  mAcc: 84.4600  data_time: 0.0587  time: 0.0758
+2023/05/19 14:08:05 - mmengine - INFO - Iter(train) [ 1400/12000]  lr: 8.8669e-03  eta: 0:25:19  time: 0.1217  data_time: 0.0061  memory: 650  loss: 0.3896  decode.loss_ce: 0.3896  decode.acc_seg: 78.0901
+2023/05/19 14:08:12 - mmengine - INFO - per class results:
+2023/05/19 14:08:12 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 70.83 | 79.47 |
+|   person   | 82.87 | 92.84 |
++------------+-------+-------+
+2023/05/19 14:08:12 - mmengine - INFO - Iter(val) [60/60]    aAcc: 87.9000  mIoU: 76.8500  mAcc: 86.1600  data_time: 0.0594  time: 0.0761
+2023/05/19 14:08:12 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_960.pth is removed
+2023/05/19 14:08:14 - mmengine - INFO - The best checkpoint with 87.9000 aAcc at 1440 iter is saved to best_aAcc_iter_1440.pth.
+2023/05/19 14:08:36 - mmengine - INFO - Iter(train) [ 1600/12000]  lr: 8.6590e-03  eta: 0:24:52  time: 0.1386  data_time: 0.0071  memory: 650  loss: 0.4060  decode.loss_ce: 0.4060  decode.acc_seg: 77.7265
+2023/05/19 14:08:49 - mmengine - INFO - per class results:
+2023/05/19 14:08:49 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 73.73 | 82.69 |
+|   person   | 84.32 | 92.88 |
++------------+-------+-------+
+2023/05/19 14:08:49 - mmengine - INFO - Iter(val) [60/60]    aAcc: 89.1100  mIoU: 79.0300  mAcc: 87.7800  data_time: 0.0580  time: 0.0761
+2023/05/19 14:08:49 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_1440.pth is removed
+2023/05/19 14:08:50 - mmengine - INFO - The best checkpoint with 89.1100 aAcc at 1680 iter is saved to best_aAcc_iter_1680.pth.
+2023/05/19 14:09:07 - mmengine - INFO - Iter(train) [ 1800/12000]  lr: 8.4505e-03  eta: 0:24:25  time: 0.1398  data_time: 0.0069  memory: 650  loss: 0.4070  decode.loss_ce: 0.4070  decode.acc_seg: 81.7996
+2023/05/19 14:09:25 - mmengine - INFO - per class results:
+2023/05/19 14:09:25 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 74.07 | 83.15 |
+|   person   | 84.46 | 92.81 |
++------------+-------+-------+
+2023/05/19 14:09:25 - mmengine - INFO - Iter(val) [60/60]    aAcc: 89.2400  mIoU: 79.2700  mAcc: 87.9800  data_time: 0.0642  time: 0.0816
+2023/05/19 14:09:25 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_1680.pth is removed
+2023/05/19 14:09:27 - mmengine - INFO - The best checkpoint with 89.2400 aAcc at 1920 iter is saved to best_aAcc_iter_1920.pth.
+2023/05/19 14:09:38 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:09:38 - mmengine - INFO - Iter(train) [ 2000/12000]  lr: 8.2414e-03  eta: 0:23:59  time: 0.1299  data_time: 0.0074  memory: 650  loss: 0.3513  decode.loss_ce: 0.3513  decode.acc_seg: 84.8504
+2023/05/19 14:10:03 - mmengine - INFO - per class results:
+2023/05/19 14:10:03 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 73.46 | 80.14 |
+|   person   | 84.79 | 94.67 |
++------------+-------+-------+
+2023/05/19 14:10:03 - mmengine - INFO - Iter(val) [60/60]    aAcc: 89.3000  mIoU: 79.1300  mAcc: 87.4100  data_time: 0.0737  time: 0.0967
+2023/05/19 14:10:03 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_1920.pth is removed
+2023/05/19 14:10:04 - mmengine - INFO - The best checkpoint with 89.3000 aAcc at 2160 iter is saved to best_aAcc_iter_2160.pth.
+2023/05/19 14:10:10 - mmengine - INFO - Iter(train) [ 2200/12000]  lr: 8.0318e-03  eta: 0:23:34  time: 0.1335  data_time: 0.0074  memory: 650  loss: 0.3568  decode.loss_ce: 0.3568  decode.acc_seg: 69.5045
+2023/05/19 14:10:37 - mmengine - INFO - Iter(train) [ 2400/12000]  lr: 7.8215e-03  eta: 0:22:59  time: 0.1401  data_time: 0.0071  memory: 650  loss: 0.4007  decode.loss_ce: 0.4007  decode.acc_seg: 83.6207
+2023/05/19 14:10:37 - mmengine - INFO - Saving checkpoint at 2400 iterations
+2023/05/19 14:10:41 - mmengine - INFO - per class results:
+2023/05/19 14:10:41 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 75.73 | 83.69 |
+|   person   | 85.65 | 93.84 |
++------------+-------+-------+
+2023/05/19 14:10:41 - mmengine - INFO - Iter(val) [60/60]    aAcc: 90.0900  mIoU: 80.6900  mAcc: 88.7600  data_time: 0.0567  time: 0.0756
+2023/05/19 14:10:41 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_2160.pth is removed
+2023/05/19 14:10:42 - mmengine - INFO - The best checkpoint with 90.0900 aAcc at 2400 iter is saved to best_aAcc_iter_2400.pth.
+2023/05/19 14:11:10 - mmengine - INFO - Iter(train) [ 2600/12000]  lr: 7.6106e-03  eta: 0:22:32  time: 0.1350  data_time: 0.0074  memory: 650  loss: 0.3203  decode.loss_ce: 0.3203  decode.acc_seg: 84.8380
+2023/05/19 14:11:18 - mmengine - INFO - per class results:
+2023/05/19 14:11:18 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 76.04 | 87.01 |
+|   person   | 85.06 | 91.54 |
++------------+-------+-------+
+2023/05/19 14:11:18 - mmengine - INFO - Iter(val) [60/60]    aAcc: 89.8700  mIoU: 80.5500  mAcc: 89.2800  data_time: 0.0711  time: 0.0904
+2023/05/19 14:11:39 - mmengine - INFO - Iter(train) [ 2800/12000]  lr: 7.3990e-03  eta: 0:21:58  time: 0.1333  data_time: 0.0075  memory: 650  loss: 0.2975  decode.loss_ce: 0.2975  decode.acc_seg: 86.0126
+2023/05/19 14:11:52 - mmengine - INFO - per class results:
+2023/05/19 14:11:52 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 78.08 | 86.14 |
+|   person   | 86.89 | 93.95 |
++------------+-------+-------+
+2023/05/19 14:11:52 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.0600  mIoU: 82.4900  mAcc: 90.0400  data_time: 0.0631  time: 0.0805
+2023/05/19 14:11:52 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_2400.pth is removed
+2023/05/19 14:11:53 - mmengine - INFO - The best checkpoint with 91.0600 aAcc at 2880 iter is saved to best_aAcc_iter_2880.pth.
+2023/05/19 14:12:11 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:12:11 - mmengine - INFO - Iter(train) [ 3000/12000]  lr: 7.1868e-03  eta: 0:21:31  time: 0.1294  data_time: 0.0069  memory: 650  loss: 0.3464  decode.loss_ce: 0.3464  decode.acc_seg: 73.3792
+2023/05/19 14:12:29 - mmengine - INFO - per class results:
+2023/05/19 14:12:29 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 76.95 | 85.28 |
+|   person   | 86.21 | 93.65 |
++------------+-------+-------+
+2023/05/19 14:12:29 - mmengine - INFO - Iter(val) [60/60]    aAcc: 90.5600  mIoU: 81.5800  mAcc: 89.4700  data_time: 0.0638  time: 0.0839
+2023/05/19 14:12:40 - mmengine - INFO - Iter(train) [ 3200/12000]  lr: 6.9738e-03  eta: 0:20:58  time: 0.1322  data_time: 0.0063  memory: 650  loss: 0.3148  decode.loss_ce: 0.3148  decode.acc_seg: 81.2182
+2023/05/19 14:13:03 - mmengine - INFO - per class results:
+2023/05/19 14:13:03 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 78.59 | 86.93 |
+|   person   |  87.1 | 93.78 |
++------------+-------+-------+
+2023/05/19 14:13:03 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.2500  mIoU: 82.8500  mAcc: 90.3500  data_time: 0.0606  time: 0.0778
+2023/05/19 14:13:03 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_2880.pth is removed
+2023/05/19 14:13:05 - mmengine - INFO - The best checkpoint with 91.2500 aAcc at 3360 iter is saved to best_aAcc_iter_3360.pth.
+2023/05/19 14:13:10 - mmengine - INFO - Iter(train) [ 3400/12000]  lr: 6.7601e-03  eta: 0:20:28  time: 0.1339  data_time: 0.0075  memory: 650  loss: 0.3382  decode.loss_ce: 0.3382  decode.acc_seg: 90.8939
+2023/05/19 14:13:37 - mmengine - INFO - Iter(train) [ 3600/12000]  lr: 6.5457e-03  eta: 0:19:56  time: 0.1280  data_time: 0.0068  memory: 650  loss: 0.3381  decode.loss_ce: 0.3381  decode.acc_seg: 69.1877
+2023/05/19 14:13:39 - mmengine - INFO - per class results:
+2023/05/19 14:13:39 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 78.32 | 86.77 |
+|   person   | 86.93 | 93.68 |
++------------+-------+-------+
+2023/05/19 14:13:39 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.1200  mIoU: 82.6300  mAcc: 90.2200  data_time: 0.0603  time: 0.0773
+2023/05/19 14:14:06 - mmengine - INFO - Iter(train) [ 3800/12000]  lr: 6.3304e-03  eta: 0:19:24  time: 0.1351  data_time: 0.0067  memory: 650  loss: 0.4328  decode.loss_ce: 0.4328  decode.acc_seg: 64.1391
+2023/05/19 14:14:13 - mmengine - INFO - per class results:
+2023/05/19 14:14:13 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 79.86 | 88.42 |
+|   person   | 87.76 | 93.71 |
++------------+-------+-------+
+2023/05/19 14:14:13 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.7600  mIoU: 83.8100  mAcc: 91.0700  data_time: 0.0640  time: 0.0815
+2023/05/19 14:14:13 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_3360.pth is removed
+2023/05/19 14:14:14 - mmengine - INFO - The best checkpoint with 91.7600 aAcc at 3840 iter is saved to best_aAcc_iter_3840.pth.
+2023/05/19 14:14:37 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:14:37 - mmengine - INFO - Iter(train) [ 4000/12000]  lr: 6.1143e-03  eta: 0:18:57  time: 0.1396  data_time: 0.0074  memory: 650  loss: 0.2700  decode.loss_ce: 0.2700  decode.acc_seg: 81.8875
+2023/05/19 14:14:50 - mmengine - INFO - per class results:
+2023/05/19 14:14:50 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 79.09 | 89.05 |
+|   person   | 87.03 | 92.62 |
++------------+-------+-------+
+2023/05/19 14:14:50 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.3000  mIoU: 83.0600  mAcc: 90.8300  data_time: 0.0736  time: 0.0923
+2023/05/19 14:15:06 - mmengine - INFO - Iter(train) [ 4200/12000]  lr: 5.8974e-03  eta: 0:18:25  time: 0.1370  data_time: 0.0073  memory: 650  loss: 0.2696  decode.loss_ce: 0.2696  decode.acc_seg: 93.7374
+2023/05/19 14:15:24 - mmengine - INFO - per class results:
+2023/05/19 14:15:24 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 80.18 | 89.21 |
+|   person   | 87.84 |  93.4 |
++------------+-------+-------+
+2023/05/19 14:15:24 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.8500  mIoU: 84.0100  mAcc: 91.3000  data_time: 0.0535  time: 0.0751
+2023/05/19 14:15:24 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_3840.pth is removed
+2023/05/19 14:15:26 - mmengine - INFO - The best checkpoint with 91.8500 aAcc at 4320 iter is saved to best_aAcc_iter_4320.pth.
+2023/05/19 14:15:36 - mmengine - INFO - Iter(train) [ 4400/12000]  lr: 5.6795e-03  eta: 0:17:58  time: 0.1367  data_time: 0.0071  memory: 650  loss: 0.3118  decode.loss_ce: 0.3118  decode.acc_seg: 90.2848
+2023/05/19 14:16:00 - mmengine - INFO - per class results:
+2023/05/19 14:16:00 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 80.44 | 87.26 |
+|   person   | 88.43 | 95.03 |
++------------+-------+-------+
+2023/05/19 14:16:00 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.1600  mIoU: 84.4300  mAcc: 91.1500  data_time: 0.0571  time: 0.0746
+2023/05/19 14:16:00 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_4320.pth is removed
+2023/05/19 14:16:01 - mmengine - INFO - The best checkpoint with 92.1600 aAcc at 4560 iter is saved to best_aAcc_iter_4560.pth.
+2023/05/19 14:16:07 - mmengine - INFO - Iter(train) [ 4600/12000]  lr: 5.4607e-03  eta: 0:17:30  time: 0.1314  data_time: 0.0068  memory: 650  loss: 0.3641  decode.loss_ce: 0.3641  decode.acc_seg: 67.7633
+2023/05/19 14:16:34 - mmengine - INFO - Iter(train) [ 4800/12000]  lr: 5.2409e-03  eta: 0:17:00  time: 0.1333  data_time: 0.0074  memory: 650  loss: 0.2839  decode.loss_ce: 0.2839  decode.acc_seg: 88.5495
+2023/05/19 14:16:34 - mmengine - INFO - Saving checkpoint at 4800 iterations
+2023/05/19 14:16:37 - mmengine - INFO - per class results:
+2023/05/19 14:16:37 - mmengine - INFO - 
++------------+-------+------+
+|   Class    |  IoU  | Acc  |
++------------+-------+------+
+| background | 80.11 | 87.5 |
+|   person   | 88.13 | 94.6 |
++------------+-------+------+
+2023/05/19 14:16:37 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.9700  mIoU: 84.1200  mAcc: 91.0500  data_time: 0.0556  time: 0.0728
+2023/05/19 14:17:04 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:17:04 - mmengine - INFO - Iter(train) [ 5000/12000]  lr: 5.0200e-03  eta: 0:16:30  time: 0.1303  data_time: 0.0071  memory: 650  loss: 0.2337  decode.loss_ce: 0.2337  decode.acc_seg: 95.6215
+2023/05/19 14:17:12 - mmengine - INFO - per class results:
+2023/05/19 14:17:12 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 80.17 | 87.99 |
+|   person   | 88.08 | 94.28 |
++------------+-------+-------+
+2023/05/19 14:17:12 - mmengine - INFO - Iter(val) [60/60]    aAcc: 91.9500  mIoU: 84.1200  mAcc: 91.1400  data_time: 0.0659  time: 0.0842
+2023/05/19 14:17:33 - mmengine - INFO - Iter(train) [ 5200/12000]  lr: 4.7981e-03  eta: 0:15:59  time: 0.1344  data_time: 0.0075  memory: 650  loss: 0.3175  decode.loss_ce: 0.3175  decode.acc_seg: 91.4173
+2023/05/19 14:17:46 - mmengine - INFO - per class results:
+2023/05/19 14:17:46 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 81.47 | 89.94 |
+|   person   | 88.68 | 93.91 |
++------------+-------+-------+
+2023/05/19 14:17:46 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.4400  mIoU: 85.0700  mAcc: 91.9200  data_time: 0.0558  time: 0.0742
+2023/05/19 14:17:46 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_4560.pth is removed
+2023/05/19 14:17:48 - mmengine - INFO - The best checkpoint with 92.4400 aAcc at 5280 iter is saved to best_aAcc_iter_5280.pth.
+2023/05/19 14:18:04 - mmengine - INFO - Iter(train) [ 5400/12000]  lr: 4.5749e-03  eta: 0:15:32  time: 0.1288  data_time: 0.0071  memory: 650  loss: 0.3029  decode.loss_ce: 0.3029  decode.acc_seg: 86.4692
+2023/05/19 14:18:22 - mmengine - INFO - per class results:
+2023/05/19 14:18:22 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 80.86 | 90.66 |
+|   person   | 88.07 | 92.89 |
++------------+-------+-------+
+2023/05/19 14:18:22 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.0700  mIoU: 84.4700  mAcc: 91.7800  data_time: 0.0663  time: 0.0833
+2023/05/19 14:18:33 - mmengine - INFO - Iter(train) [ 5600/12000]  lr: 4.3505e-03  eta: 0:15:02  time: 0.1318  data_time: 0.0062  memory: 650  loss: 0.2791  decode.loss_ce: 0.2791  decode.acc_seg: 88.8846
+2023/05/19 14:18:56 - mmengine - INFO - per class results:
+2023/05/19 14:18:56 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  82.2 | 88.53 |
+|   person   | 89.47 | 95.49 |
++------------+-------+-------+
+2023/05/19 14:18:56 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.9200  mIoU: 85.8400  mAcc: 92.0100  data_time: 0.0563  time: 0.0745
+2023/05/19 14:18:56 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_5280.pth is removed
+2023/05/19 14:18:57 - mmengine - INFO - The best checkpoint with 92.9200 aAcc at 5760 iter is saved to best_aAcc_iter_5760.pth.
+2023/05/19 14:19:03 - mmengine - INFO - Iter(train) [ 5800/12000]  lr: 4.1248e-03  eta: 0:14:33  time: 0.1394  data_time: 0.0074  memory: 650  loss: 0.2839  decode.loss_ce: 0.2839  decode.acc_seg: 85.8696
+2023/05/19 14:19:30 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:19:30 - mmengine - INFO - Iter(train) [ 6000/12000]  lr: 3.8977e-03  eta: 0:14:04  time: 0.1367  data_time: 0.0071  memory: 650  loss: 0.3778  decode.loss_ce: 0.3778  decode.acc_seg: 84.4144
+2023/05/19 14:19:32 - mmengine - INFO - per class results:
+2023/05/19 14:19:32 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 81.43 | 89.78 |
+|   person   | 88.68 | 93.99 |
++------------+-------+-------+
+2023/05/19 14:19:32 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.4300  mIoU: 85.0500  mAcc: 91.8900  data_time: 0.0729  time: 0.0908
+2023/05/19 14:19:59 - mmengine - INFO - Iter(train) [ 6200/12000]  lr: 3.6691e-03  eta: 0:13:35  time: 0.1317  data_time: 0.0079  memory: 650  loss: 0.3518  decode.loss_ce: 0.3518  decode.acc_seg: 83.0886
+2023/05/19 14:20:07 - mmengine - INFO - per class results:
+2023/05/19 14:20:07 - mmengine - INFO - 
++------------+-------+------+
+|   Class    |  IoU  | Acc  |
++------------+-------+------+
+| background | 81.66 | 91.4 |
+|   person   | 88.54 | 93.0 |
++------------+-------+------+
+2023/05/19 14:20:07 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.4100  mIoU: 85.1000  mAcc: 92.2000  data_time: 0.0639  time: 0.0825
+2023/05/19 14:20:29 - mmengine - INFO - Iter(train) [ 6400/12000]  lr: 3.4388e-03  eta: 0:13:07  time: 0.1363  data_time: 0.0077  memory: 650  loss: 0.2710  decode.loss_ce: 0.2710  decode.acc_seg: 80.6111
+2023/05/19 14:20:41 - mmengine - INFO - per class results:
+2023/05/19 14:20:41 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 82.53 | 90.51 |
+|   person   | 89.36 | 94.33 |
++------------+-------+-------+
+2023/05/19 14:20:41 - mmengine - INFO - Iter(val) [60/60]    aAcc: 92.9200  mIoU: 85.9500  mAcc: 92.4200  data_time: 0.0694  time: 0.0864
+2023/05/19 14:20:58 - mmengine - INFO - Iter(train) [ 6600/12000]  lr: 3.2067e-03  eta: 0:12:37  time: 0.1391  data_time: 0.0073  memory: 650  loss: 0.2794  decode.loss_ce: 0.2794  decode.acc_seg: 94.8188
+2023/05/19 14:21:16 - mmengine - INFO - per class results:
+2023/05/19 14:21:16 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.86 | 89.54 |
+|   person   | 90.48 | 96.02 |
++------------+-------+-------+
+2023/05/19 14:21:16 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6300  mIoU: 87.1700  mAcc: 92.7800  data_time: 0.0667  time: 0.0887
+2023/05/19 14:21:16 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_5760.pth is removed
+2023/05/19 14:21:18 - mmengine - INFO - The best checkpoint with 93.6300 aAcc at 6720 iter is saved to best_aAcc_iter_6720.pth.
+2023/05/19 14:21:29 - mmengine - INFO - Iter(train) [ 6800/12000]  lr: 2.9727e-03  eta: 0:12:10  time: 0.1421  data_time: 0.0074  memory: 650  loss: 0.2618  decode.loss_ce: 0.2618  decode.acc_seg: 95.8709
+2023/05/19 14:21:52 - mmengine - INFO - per class results:
+2023/05/19 14:21:52 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.53 | 91.81 |
+|   person   | 89.87 | 94.19 |
++------------+-------+-------+
+2023/05/19 14:21:52 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.3100  mIoU: 86.7000  mAcc: 93.0000  data_time: 0.0639  time: 0.0807
+2023/05/19 14:21:58 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:21:58 - mmengine - INFO - Iter(train) [ 7000/12000]  lr: 2.7366e-03  eta: 0:11:41  time: 0.1491  data_time: 0.0073  memory: 650  loss: 0.2838  decode.loss_ce: 0.2838  decode.acc_seg: 79.1948
+2023/05/19 14:22:25 - mmengine - INFO - Iter(train) [ 7200/12000]  lr: 2.4980e-03  eta: 0:11:13  time: 0.1344  data_time: 0.0075  memory: 650  loss: 0.3192  decode.loss_ce: 0.3192  decode.acc_seg: 92.3188
+2023/05/19 14:22:25 - mmengine - INFO - Saving checkpoint at 7200 iterations
+2023/05/19 14:22:29 - mmengine - INFO - per class results:
+2023/05/19 14:22:29 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.18 |  91.0 |
+|   person   | 89.75 | 94.49 |
++------------+-------+-------+
+2023/05/19 14:22:29 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.2000  mIoU: 86.4700  mAcc: 92.7500  data_time: 0.0646  time: 0.0822
+2023/05/19 14:22:56 - mmengine - INFO - Iter(train) [ 7400/12000]  lr: 2.2569e-03  eta: 0:10:44  time: 0.1295  data_time: 0.0074  memory: 650  loss: 0.3023  decode.loss_ce: 0.3023  decode.acc_seg: 76.6874
+2023/05/19 14:23:03 - mmengine - INFO - per class results:
+2023/05/19 14:23:03 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.75 | 91.14 |
+|   person   | 90.15 | 94.83 |
++------------+-------+-------+
+2023/05/19 14:23:03 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.4700  mIoU: 86.9500  mAcc: 92.9800  data_time: 0.0675  time: 0.0848
+2023/05/19 14:23:24 - mmengine - INFO - Iter(train) [ 7600/12000]  lr: 2.0126e-03  eta: 0:10:15  time: 0.1308  data_time: 0.0073  memory: 650  loss: 0.2666  decode.loss_ce: 0.2666  decode.acc_seg: 88.9068
+2023/05/19 14:23:38 - mmengine - INFO - per class results:
+2023/05/19 14:23:38 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.92 | 90.82 |
+|   person   | 90.31 | 95.17 |
++------------+-------+-------+
+2023/05/19 14:23:38 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.5700  mIoU: 87.1100  mAcc: 93.0000  data_time: 0.0632  time: 0.0804
+2023/05/19 14:23:54 - mmengine - INFO - Iter(train) [ 7800/12000]  lr: 1.7649e-03  eta: 0:09:47  time: 0.1333  data_time: 0.0064  memory: 650  loss: 0.2565  decode.loss_ce: 0.2565  decode.acc_seg: 96.2662
+2023/05/19 14:24:12 - mmengine - INFO - per class results:
+2023/05/19 14:24:12 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  83.6 | 91.25 |
+|   person   | 90.02 | 94.64 |
++------------+-------+-------+
+2023/05/19 14:24:12 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.3800  mIoU: 86.8100  mAcc: 92.9400  data_time: 0.0590  time: 0.0770
+2023/05/19 14:24:23 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:24:23 - mmengine - INFO - Iter(train) [ 8000/12000]  lr: 1.5129e-03  eta: 0:09:18  time: 0.1406  data_time: 0.0073  memory: 650  loss: 0.2385  decode.loss_ce: 0.2385  decode.acc_seg: 85.7903
+2023/05/19 14:24:47 - mmengine - INFO - per class results:
+2023/05/19 14:24:47 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.72 |  91.0 |
+|   person   | 90.15 | 94.91 |
++------------+-------+-------+
+2023/05/19 14:24:47 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.4600  mIoU: 86.9300  mAcc: 92.9500  data_time: 0.0642  time: 0.0895
+2023/05/19 14:24:52 - mmengine - INFO - Iter(train) [ 8200/12000]  lr: 1.2558e-03  eta: 0:08:50  time: 0.1308  data_time: 0.0071  memory: 650  loss: 0.2834  decode.loss_ce: 0.2834  decode.acc_seg: 91.6885
+2023/05/19 14:25:19 - mmengine - INFO - Iter(train) [ 8400/12000]  lr: 9.9217e-04  eta: 0:08:22  time: 0.1453  data_time: 0.0064  memory: 650  loss: 0.3319  decode.loss_ce: 0.3319  decode.acc_seg: 88.8760
+2023/05/19 14:25:21 - mmengine - INFO - per class results:
+2023/05/19 14:25:21 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 84.05 | 91.22 |
+|   person   | 90.35 |  95.0 |
++------------+-------+-------+
+2023/05/19 14:25:21 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6000  mIoU: 87.2000  mAcc: 93.1100  data_time: 0.0501  time: 0.0706
+2023/05/19 14:25:48 - mmengine - INFO - Iter(train) [ 8600/12000]  lr: 7.1939e-04  eta: 0:07:54  time: 0.1308  data_time: 0.0074  memory: 650  loss: 0.2259  decode.loss_ce: 0.2259  decode.acc_seg: 91.5131
+2023/05/19 14:25:56 - mmengine - INFO - per class results:
+2023/05/19 14:25:56 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 84.02 | 91.62 |
+|   person   | 90.26 | 94.69 |
++------------+-------+-------+
+2023/05/19 14:25:56 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.5600  mIoU: 87.1400  mAcc: 93.1600  data_time: 0.0736  time: 0.0957
+2023/05/19 14:26:18 - mmengine - INFO - Iter(train) [ 8800/12000]  lr: 4.3192e-04  eta: 0:07:25  time: 0.1335  data_time: 0.0064  memory: 650  loss: 0.2518  decode.loss_ce: 0.2518  decode.acc_seg: 87.6452
+2023/05/19 14:26:30 - mmengine - INFO - per class results:
+2023/05/19 14:26:30 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.82 | 91.24 |
+|   person   | 90.17 | 94.81 |
++------------+-------+-------+
+2023/05/19 14:26:30 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.4900  mIoU: 87.0000  mAcc: 93.0200  data_time: 0.0655  time: 0.0874
+2023/05/19 14:26:47 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:26:47 - mmengine - INFO - Iter(train) [ 9000/12000]  lr: 1.0000e-04  eta: 0:06:57  time: 0.1301  data_time: 0.0060  memory: 650  loss: 0.2174  decode.loss_ce: 0.2174  decode.acc_seg: 92.1582
+2023/05/19 14:27:05 - mmengine - INFO - per class results:
+2023/05/19 14:27:05 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.86 | 91.12 |
+|   person   | 90.22 | 94.92 |
++------------+-------+-------+
+2023/05/19 14:27:05 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.5200  mIoU: 87.0400  mAcc: 93.0200  data_time: 0.0654  time: 0.0827
+2023/05/19 14:27:16 - mmengine - INFO - Iter(train) [ 9200/12000]  lr: 9.4008e-05  eta: 0:06:29  time: 0.1301  data_time: 0.0065  memory: 650  loss: 0.2555  decode.loss_ce: 0.2555  decode.acc_seg: 96.0852
+2023/05/19 14:27:40 - mmengine - INFO - per class results:
+2023/05/19 14:27:40 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.81 | 91.28 |
+|   person   | 90.16 | 94.77 |
++------------+-------+-------+
+2023/05/19 14:27:40 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.4800  mIoU: 86.9900  mAcc: 93.0300  data_time: 0.0617  time: 0.0858
+2023/05/19 14:27:45 - mmengine - INFO - Iter(train) [ 9400/12000]  lr: 8.7942e-05  eta: 0:06:01  time: 0.1281  data_time: 0.0075  memory: 650  loss: 0.2687  decode.loss_ce: 0.2687  decode.acc_seg: 84.6791
+2023/05/19 14:28:13 - mmengine - INFO - Iter(train) [ 9600/12000]  lr: 8.1830e-05  eta: 0:05:33  time: 0.1436  data_time: 0.0070  memory: 650  loss: 0.2460  decode.loss_ce: 0.2460  decode.acc_seg: 84.3159
+2023/05/19 14:28:13 - mmengine - INFO - Saving checkpoint at 9600 iterations
+2023/05/19 14:28:16 - mmengine - INFO - per class results:
+2023/05/19 14:28:16 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 84.04 | 90.79 |
+|   person   | 90.41 | 95.29 |
++------------+-------+-------+
+2023/05/19 14:28:16 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6300  mIoU: 87.2300  mAcc: 93.0400  data_time: 0.0546  time: 0.0718
+2023/05/19 14:28:43 - mmengine - INFO - Iter(train) [ 9800/12000]  lr: 7.5666e-05  eta: 0:05:05  time: 0.1304  data_time: 0.0073  memory: 650  loss: 0.3081  decode.loss_ce: 0.3081  decode.acc_seg: 85.9960
+2023/05/19 14:28:50 - mmengine - INFO - per class results:
+2023/05/19 14:28:50 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.91 | 91.08 |
+|   person   | 90.26 | 94.98 |
++------------+-------+-------+
+2023/05/19 14:28:50 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.5400  mIoU: 87.0900  mAcc: 93.0300  data_time: 0.0537  time: 0.0738
+2023/05/19 14:29:12 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:29:12 - mmengine - INFO - Iter(train) [10000/12000]  lr: 6.9446e-05  eta: 0:04:37  time: 0.1319  data_time: 0.0063  memory: 650  loss: 0.3230  decode.loss_ce: 0.3230  decode.acc_seg: 72.5284
+2023/05/19 14:29:25 - mmengine - INFO - per class results:
+2023/05/19 14:29:25 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.99 | 90.65 |
+|   person   | 90.39 | 95.35 |
++------------+-------+-------+
+2023/05/19 14:29:25 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6100  mIoU: 87.1900  mAcc: 93.0000  data_time: 0.0667  time: 0.0830
+2023/05/19 14:29:42 - mmengine - INFO - Iter(train) [10200/12000]  lr: 6.3164e-05  eta: 0:04:10  time: 0.1346  data_time: 0.0064  memory: 650  loss: 0.2607  decode.loss_ce: 0.2607  decode.acc_seg: 85.9377
+2023/05/19 14:30:01 - mmengine - INFO - per class results:
+2023/05/19 14:30:01 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  84.0 | 91.47 |
+|   person   | 90.27 | 94.78 |
++------------+-------+-------+
+2023/05/19 14:30:01 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.5600  mIoU: 87.1300  mAcc: 93.1300  data_time: 0.0671  time: 0.0850
+2023/05/19 14:30:11 - mmengine - INFO - Iter(train) [10400/12000]  lr: 5.6811e-05  eta: 0:03:42  time: 0.1402  data_time: 0.0073  memory: 650  loss: 0.3002  decode.loss_ce: 0.3002  decode.acc_seg: 83.1718
+2023/05/19 14:30:36 - mmengine - INFO - per class results:
+2023/05/19 14:30:36 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.92 | 90.52 |
+|   person   | 90.37 | 95.39 |
++------------+-------+-------+
+2023/05/19 14:30:36 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.5900  mIoU: 87.1500  mAcc: 92.9600  data_time: 0.0641  time: 0.0832
+2023/05/19 14:30:42 - mmengine - INFO - Iter(train) [10600/12000]  lr: 5.0377e-05  eta: 0:03:14  time: 0.1359  data_time: 0.0074  memory: 650  loss: 0.3592  decode.loss_ce: 0.3592  decode.acc_seg: 76.9026
+2023/05/19 14:31:09 - mmengine - INFO - Iter(train) [10800/12000]  lr: 4.3851e-05  eta: 0:02:46  time: 0.1323  data_time: 0.0072  memory: 650  loss: 0.2818  decode.loss_ce: 0.2818  decode.acc_seg: 96.9824
+2023/05/19 14:31:11 - mmengine - INFO - per class results:
+2023/05/19 14:31:11 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 84.06 | 90.55 |
+|   person   | 90.46 | 95.47 |
++------------+-------+-------+
+2023/05/19 14:31:11 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6500  mIoU: 87.2600  mAcc: 93.0100  data_time: 0.0727  time: 0.0898
+2023/05/19 14:31:11 - mmengine - INFO - The previous best checkpoint /home/wenbo_chen/computer_vision/mmsegmentation/work_dirs/seacfg/best_aAcc_iter_6720.pth is removed
+2023/05/19 14:31:13 - mmengine - INFO - The best checkpoint with 93.6500 aAcc at 10800 iter is saved to best_aAcc_iter_10800.pth.
+2023/05/19 14:31:39 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:31:39 - mmengine - INFO - Iter(train) [11000/12000]  lr: 3.7215e-05  eta: 0:02:18  time: 0.1309  data_time: 0.0060  memory: 650  loss: 0.2505  decode.loss_ce: 0.2505  decode.acc_seg: 84.3303
+2023/05/19 14:31:47 - mmengine - INFO - per class results:
+2023/05/19 14:31:47 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 84.12 | 91.03 |
+|   person   | 90.43 | 95.18 |
++------------+-------+-------+
+2023/05/19 14:31:47 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6500  mIoU: 87.2800  mAcc: 93.1100  data_time: 0.0736  time: 0.0963
+2023/05/19 14:32:08 - mmengine - INFO - Iter(train) [11200/12000]  lr: 3.0444e-05  eta: 0:01:51  time: 0.1328  data_time: 0.0074  memory: 650  loss: 0.2631  decode.loss_ce: 0.2631  decode.acc_seg: 94.2717
+2023/05/19 14:32:20 - mmengine - INFO - per class results:
+2023/05/19 14:32:20 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.67 |  91.2 |
+|   person   | 90.07 | 94.72 |
++------------+-------+-------+
+2023/05/19 14:32:20 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.4200  mIoU: 86.8700  mAcc: 92.9600  data_time: 0.0673  time: 0.0849
+2023/05/19 14:32:36 - mmengine - INFO - Iter(train) [11400/12000]  lr: 2.3499e-05  eta: 0:01:23  time: 0.1274  data_time: 0.0064  memory: 650  loss: 0.2239  decode.loss_ce: 0.2239  decode.acc_seg: 94.3140
+2023/05/19 14:32:54 - mmengine - INFO - per class results:
+2023/05/19 14:32:54 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background |  84.0 | 90.92 |
+|   person   | 90.36 | 95.17 |
++------------+-------+-------+
+2023/05/19 14:32:54 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6000  mIoU: 87.1800  mAcc: 93.0400  data_time: 0.0551  time: 0.0714
+2023/05/19 14:33:05 - mmengine - INFO - Iter(train) [11600/12000]  lr: 1.6315e-05  eta: 0:00:55  time: 0.1372  data_time: 0.0074  memory: 650  loss: 0.2469  decode.loss_ce: 0.2469  decode.acc_seg: 76.6275
+2023/05/19 14:33:28 - mmengine - INFO - per class results:
+2023/05/19 14:33:28 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 83.73 | 91.25 |
+|   person   | 90.11 | 94.74 |
++------------+-------+-------+
+2023/05/19 14:33:28 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.4500  mIoU: 86.9200  mAcc: 92.9900  data_time: 0.0736  time: 0.0899
+2023/05/19 14:33:34 - mmengine - INFO - Iter(train) [11800/12000]  lr: 8.7428e-06  eta: 0:00:27  time: 0.1387  data_time: 0.0058  memory: 650  loss: 0.2600  decode.loss_ce: 0.2600  decode.acc_seg: 91.8298
+2023/05/19 14:34:00 - mmengine - INFO - Exp name: seacfg_20230519_140419
+2023/05/19 14:34:00 - mmengine - INFO - Iter(train) [12000/12000]  lr: 0.0000e+00  eta: 0:00:00  time: 0.1310  data_time: 0.0076  memory: 650  loss: 0.2144  decode.loss_ce: 0.2144  decode.acc_seg: 89.2290
+2023/05/19 14:34:00 - mmengine - INFO - Saving checkpoint at 12000 iterations
+2023/05/19 14:34:04 - mmengine - INFO - per class results:
+2023/05/19 14:34:04 - mmengine - INFO - 
++------------+-------+-------+
+|   Class    |  IoU  |  Acc  |
++------------+-------+-------+
+| background | 84.05 | 91.19 |
+|   person   | 90.35 | 95.02 |
++------------+-------+-------+
+2023/05/19 14:34:04 - mmengine - INFO - Iter(val) [60/60]    aAcc: 93.6000  mIoU: 87.2000  mAcc: 93.1000  data_time: 0.0556  time: 0.0779
