@@ -13,7 +13,7 @@ Simple Aggregation PPM, SAPPM
 
 ![Alt text](latex_/sappm.png)
 
-流对齐?注意力融合模块
+流对齐-注意力融合模块
 
 ![Alt text](latex_/cusfuse.png)
 
